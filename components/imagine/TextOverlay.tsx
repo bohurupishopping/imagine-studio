@@ -40,9 +40,20 @@ export function TextOverlay({
 
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging) {
+      const container = document.querySelector('.image-container');
+      if (!container) return;
+      
+      const rect = container.getBoundingClientRect();
+      const xPercent = ((e.clientX - rect.left) / rect.width) * 100;
+      const yPercent = ((e.clientY - rect.top) / rect.height) * 100;
+      
+      // Keep text within image bounds with 5% margin
+      const newX = Math.min(Math.max(5, xPercent), 95);
+      const newY = Math.min(Math.max(5, yPercent), 95);
+      
       onPositionChange({
-        x: position.x + e.movementX,
-        y: position.y + e.movementY
+        x: newX,
+        y: newY
       });
     }
   };
@@ -53,15 +64,26 @@ export function TextOverlay({
     document.removeEventListener('mouseup', handleMouseUp);
   };
 
+  const [textAlign, setTextAlign] = useState<'left' | 'center' | 'right'>('center');
+  const [backgroundColor, setBackgroundColor] = useState('transparent');
+  const [textShadow, setTextShadow] = useState('none');
+  const [rotation, setRotation] = useState(0);
+
   return (
     <div
       className="absolute cursor-move select-none"
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
+        left: `${position.x}%`,
+        top: `${position.y}%`,
         fontSize: `${fontSize}px`,
         color: color,
-        transform: 'translate(-50%, -50%)'
+        transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+        pointerEvents: 'auto',
+        textAlign,
+        backgroundColor,
+        textShadow,
+        padding: '4px 8px',
+        borderRadius: '4px'
       }}
       onMouseDown={handleMouseDown}
     >
@@ -114,6 +136,88 @@ export function TextOverlay({
                       onStyleChange({ fontSize, color: e.target.value })
                     }
                     className="col-span-2 h-8 p-1"
+                  />
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label>Alignment</Label>
+                  <div className="col-span-2 flex gap-2">
+                    <Button
+                      variant={textAlign === 'left' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTextAlign('left')}
+                    >
+                      Left
+                    </Button>
+                    <Button
+                      variant={textAlign === 'center' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTextAlign('center')}
+                    >
+                      Center
+                    </Button>
+                    <Button
+                      variant={textAlign === 'right' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setTextAlign('right')}
+                    >
+                      Right
+                    </Button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="bgColor">Background</Label>
+                  <Input
+                    type="color"
+                    id="bgColor"
+                    value={backgroundColor}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                    className="col-span-2 h-8 p-1"
+                  />
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="shadow">Shadow</Label>
+                  <Input
+                    id="shadow"
+                    value={textShadow}
+                    onChange={(e) => setTextShadow(e.target.value)}
+                    placeholder="e.g. 2px 2px 4px #000"
+                    className="col-span-2 h-8"
+                  />
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="rotation">Rotation</Label>
+                  <Slider
+                    id="rotation"
+                    defaultValue={[rotation]}
+                    min={-180}
+                    max={180}
+                    step={1}
+                    onValueChange={([value]) => setRotation(value)}
+                    className="col-span-2"
+                  />
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="positionX">Horizontal</Label>
+                  <Slider
+                    id="positionX"
+                    value={[position.x]}
+                    min={0}
+                    max={100}
+                    step={1}
+                    onValueChange={([value]) => onPositionChange({ x: value, y: position.y })}
+                    className="col-span-2"
+                  />
+                </div>
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <Label htmlFor="positionY">Vertical</Label>
+                  <Slider
+                    id="positionY"
+                    value={[position.y]}
+                    min={0}
+                    max={100}
+                    step={1}
+                    onValueChange={([value]) => onPositionChange({ x: position.x, y: value })}
+                    className="col-span-2"
                   />
                 </div>
               </div>
