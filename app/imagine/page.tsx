@@ -64,26 +64,29 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-4 md:p-8">
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-7xl mx-auto space-y-8"
-      >
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-white via-purple-50 to-blue-50 p-2 sm:p-4">
+      <div className="max-w-7xl mx-auto h-full flex flex-col">
         {/* Header Section */}
         <motion.div 
-          className="flex flex-col md:flex-row justify-between items-center gap-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-6 rounded-lg"
-          whileHover={{ scale: 1.01 }}
+          className="flex justify-center p-4 pb-2"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <div className="flex items-center gap-3">
-            <Sparkles className="w-8 h-8 text-primary" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 text-transparent bg-clip-text">
-              AI Image Generator
+          <div className="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-blue-50 px-8 py-4 rounded-full border border-purple-100 shadow-lg hover:shadow-xl transition-all duration-300 group">
+            <motion.div
+              className="p-2 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg group-hover:scale-110 transition-transform"
+              whileHover={{ rotate: 15 }}
+            >
+              <Sparkles className="w-7 h-7 text-purple-600 group-hover:text-purple-700 transition-colors" />
+            </motion.div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Imagine
             </h1>
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 flex-1 overflow-hidden">
           {/* Input Section */}
           <motion.div 
             className="lg:col-span-6"
@@ -91,17 +94,26 @@ export default function GeneratePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="border-2 border-primary/20 backdrop-blur-sm bg-background/80">
-              <CardHeader className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Wand2 className="w-5 h-5 text-primary" />
-                  <CardTitle>Create Your Masterpiece</CardTitle>
+            <Card className="border border-gray-100 bg-white h-full flex flex-col hover:shadow-xl transition-shadow duration-300">
+              <CardHeader className="space-y-2 p-4 sm:p-6 pb-2 sm:pb-4">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    className="p-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg hover:scale-105 transition-transform"
+                    whileHover={{ rotate: 10 }}
+                  >
+                    <Wand2 className="w-7 h-7 text-purple-600 hover:text-purple-700 transition-colors" />
+                  </motion.div>
+                  <div>
+                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                      Create
+                    </CardTitle>
+                    <p className="text-gray-600 text-sm leading-tight">
+                      Describe your imagination in detail
+                    </p>
+                  </div>
                 </div>
-                <p className="text-muted-foreground text-sm">
-                  Describe your imagination and let AI bring it to life
-                </p>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="flex-1 p-4 sm:p-6 pt-0 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-transparent">
                 <ImageInputSection
                   onGenerate={handleGenerate}
                   isLoading={isLoading}
@@ -117,17 +129,26 @@ export default function GeneratePage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <Card className="border-2 border-primary/20 backdrop-blur-sm bg-background/80 sticky top-4">
-              <CardHeader className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <ImageIcon className="w-5 h-5 text-primary" />
-                  <CardTitle>Preview</CardTitle>
+            <Card className="border border-gray-100 bg-white h-full flex flex-col hover:shadow-xl transition-shadow duration-300">
+              <CardHeader className="space-y-2 p-4 sm:p-6 pb-2 sm:pb-4">
+                <div className="flex items-center gap-3">
+                  <motion.div
+                    className="p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg hover:scale-105 transition-transform"
+                    whileHover={{ rotate: 10 }}
+                  >
+                    <ImageIcon className="w-7 h-7 text-blue-600 hover:text-blue-700 transition-colors" />
+                  </motion.div>
+                  <div>
+                    <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      Preview
+                    </CardTitle>
+                    <p className="text-gray-600 text-sm leading-tight">
+                      Your generated masterpiece
+                    </p>
+                  </div>
                 </div>
-                <p className="text-muted-foreground text-sm">
-                  Your generated image will appear here
-                </p>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-1 p-4 sm:p-6 pt-0 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
                 <motion.div
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
@@ -148,17 +169,27 @@ export default function GeneratePage() {
         {/* Loading Overlay */}
         {isLoading && (
           <motion.div 
+            className="fixed inset-0 bg-white/95 backdrop-blur-lg flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50"
+            exit={{ opacity: 0 }}
           >
-            <div className="flex flex-col items-center gap-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="text-primary font-medium">Generating your image...</p>
+            <div className="flex flex-col items-center gap-4 bg-gradient-to-br from-white to-purple-50 p-8 rounded-2xl border border-purple-100 shadow-2xl">
+              <motion.div
+                className="animate-spin rounded-full h-14 w-14 border-4 border-purple-600 border-t-transparent"
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+              />
+              <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Crafting your vision...
+              </p>
+              <p className="text-gray-600 text-sm mt-1">
+                This usually takes 10-20 seconds
+              </p>
             </div>
           </motion.div>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 }

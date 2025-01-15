@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
 import ImageStyleSelector, { imageStyles } from './ImageStyleSelector';
 import { Sparkles, Loader2 } from 'lucide-react';
 
@@ -32,9 +33,9 @@ export default function ImageInputSection({
     <div className="w-full">
       {/* Input Area */}
       <div className={cn(
-        "relative flex flex-col gap-4",
-        "rounded-[24px]",
-        "p-4",
+        "relative flex flex-col gap-3",
+        "rounded-xl",
+        "p-3",
         "bg-white/90 dark:bg-gray-800/90",
         "border border-blue-200 dark:border-blue-800/50",
         "shadow-[0_0_0_1px_rgba(59,130,246,0.1)]",
@@ -52,13 +53,13 @@ export default function ImageInputSection({
             }}
             placeholder="Describe your image..."
             className={cn(
-              "w-full min-h-[120px] max-h-[200px] py-3 px-4",
+              "w-full min-h-[80px] max-h-[140px] py-2 px-3",
               "bg-transparent",
               "border-0 outline-0 focus:outline-0 ring-0 focus:ring-0 focus:ring-offset-0",
               "resize-none",
               "text-gray-700 dark:text-gray-200",
               "placeholder:text-gray-400 dark:placeholder:text-gray-500",
-              "text-[15px] leading-tight",
+              "text-[14px] leading-snug",
               "[&::-webkit-scrollbar]:hidden",
               "[-ms-overflow-style:none]",
               "[scrollbar-width:none]"
@@ -71,7 +72,7 @@ export default function ImageInputSection({
         </div>
 
         {/* Bottom Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {/* Style Selector */}
           <div className="flex-1">
             <ImageStyleSelector onStyleChange={handleStyleChange} />
@@ -136,13 +137,13 @@ export default function ImageInputSection({
             }}
             disabled={!prompt.trim() || isEnhancing}
             className={cn(
-              "h-12 w-32",
+              "h-10 w-28",
               "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600",
-              "text-white font-medium",
-              "rounded-xl",
+              "text-white text-sm font-medium",
+              "rounded-lg",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               "transition-all duration-200",
-              "flex items-center justify-center gap-2"
+              "flex items-center justify-center gap-1.5"
             )}
           >
             {isEnhancing ? (
@@ -165,13 +166,13 @@ export default function ImageInputSection({
             onClick={() => onGenerate(prompt)}
             disabled={isLoading || !prompt.trim()}
             className={cn(
-              "h-12 w-48",
+              "h-10 w-40",
               "bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600",
-              "text-white font-medium",
-              "rounded-xl",
+              "text-white text-sm font-medium",
+              "rounded-lg",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               "transition-all duration-200",
-              "flex items-center justify-center gap-2"
+              "flex items-center justify-center gap-1.5"
             )}
           >
             {isLoading ? (
@@ -186,8 +187,9 @@ export default function ImageInputSection({
               </>
             )}
           </Button>
-        </div>
       </div>
+
+    </div>
     </div>
   );
 }
