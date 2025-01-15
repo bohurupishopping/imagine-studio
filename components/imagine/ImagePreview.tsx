@@ -113,53 +113,84 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
     try {
       if (!canvasRef.current) return;
 
-      // Load the image
-      const img = new window.Image();
-      img.crossOrigin = 'anonymous';
-      img.src = src;
-      await new Promise<void>((resolve) => {
+      // Use proxy endpoint to fetch image
+      const proxyUrl = `/api/download-image?url=${encodeURIComponent(src)}`;
+      const response = await fetch(proxyUrl);
+      if (!response.ok) {
+        throw new Error('Failed to fetch image via proxy');
+      }
+
+      // Create image from blob
+      const blob = await response.blob();
+      const img = new window.Image() as HTMLImageElement;
+      img.src = URL.createObjectURL(blob);
+
+      await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
+        img.onerror = (err) => {
+          console.error('Image load error:', err);
+          toast({
+            title: "Error",
+            description: "Failed to load image for download. Please try again.",
+            variant: "destructive",
+          });
+          reject(err);
+        };
       });
 
-      const canvas = canvasRef.current!;
-      const ctx = canvas.getContext('2d', { willReadFrequently: true })!;
+      // Get natural dimensions
+      const naturalWidth = img.naturalWidth;
+      const naturalHeight = img.naturalHeight;
+
+      // Set up canvas
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
       if (!ctx) return;
 
-      // Set canvas dimensions
-      canvas.width = img.width;
-      canvas.height = img.height;
+      // Set canvas dimensions to match natural image size
+      canvas.width = naturalWidth;
+      canvas.height = naturalHeight;
 
-      // Apply crop
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Apply transformations
       ctx.save();
+      
+      // Apply crop
       ctx.beginPath();
       ctx.rect(
-        crop.x * img.width,
-        crop.y * img.height,
-        crop.width * img.width,
-        crop.height * img.height
+        crop.x * naturalWidth,
+        crop.y * naturalHeight,
+        crop.width * naturalWidth,
+        crop.height * naturalHeight
       );
       ctx.clip();
 
-      // Draw image with rotation
+      // Apply rotation
       ctx.translate(canvas.width / 2, canvas.height / 2);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.translate(-canvas.width / 2, -canvas.height / 2);
-      
+
       // Apply filters
       applyFilters(ctx);
-      ctx.drawImage(img, 0, 0);
+
+      // Draw the base image
+      ctx.drawImage(img, 0, 0, naturalWidth, naturalHeight);
 
       // Draw text overlays
       textOverlays.forEach(overlay => {
+        ctx.save();
         ctx.font = `${overlay.fontSize}px sans-serif`;
         ctx.fillStyle = overlay.color;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(
           overlay.text,
-          overlay.position.x * (canvas.width / 100),
-          overlay.position.y * (canvas.height / 100)
+          overlay.position.x * (naturalWidth / 100),
+          overlay.position.y * (naturalHeight / 100)
         );
+        ctx.restore();
       });
 
       ctx.restore();
@@ -182,7 +213,7 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
           title: "Success",
           description: "Image downloaded successfully",
         });
-      }, 'image/png');
+      }, 'image/png', 1.0);
     } catch (error) {
       console.error('Download error:', error);
       toast({
@@ -234,7 +265,7 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
   };
 
   return (
-    <div className="w-full h-[300px] md:h-[600px] bg-gray-100 rounded-lg flex items-center justify-center relative p-4">
+    <div className="w-full h-[300px] md:h-[600px] bg-white rounded-lg flex items-center justify-center relative p-4">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">
           <p className="text-gray-400">Loading image...</p>
@@ -259,35 +290,45 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
                 cursor: scale > 1 ? 'grab' : 'default'
               }}
             >
-              <Image
-                src={src}
-                alt={alt}
-                fill
-                className="object-contain rounded-lg select-none"
-                onLoadingComplete={() => setIsLoading(false)}
-                draggable={false}
-              />
+              {src && (
+                <Image
+                  src={`/api/download-image?url=${encodeURIComponent(src)}`}
+                  alt={alt}
+                  fill
+                  className="object-contain rounded-lg select-none"
+                  onLoadingComplete={() => setIsLoading(false)}
+                  onError={() => {
+                    setIsLoading(false);
+                    toast({
+                      title: "Error",
+                      description: "Failed to load image",
+                      variant: "destructive",
+                    });
+                  }}
+                  draggable={false}
+                />
+              )}
             </div>
           </div>
 
           {/* Controls */}
-          <div className="absolute top-2 right-2 flex gap-2">
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 bg-black/50 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg">
             <Button
-              variant="ghost"
+              variant="default"
               size="sm"
-              className="bg-white/90 backdrop-blur-sm hover:bg-white"
+              className="bg-blue-500 hover:bg-blue-600"
               onClick={addTextOverlay}
             >
-              <Plus className="h-4 w-4 text-gray-700" />
+              <Plus className="h-4 w-4 text-white" />
             </Button>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant="default"
                   size="sm"
-                  className="bg-white/90 backdrop-blur-sm hover:bg-white"
+                  className="bg-purple-500 hover:bg-purple-600"
                 >
-                  <Crop className="h-4 w-4 text-gray-700" />
+                  <Crop className="h-4 w-4 text-white" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-64">
@@ -324,11 +365,11 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant="default"
                   size="sm"
-                  className="bg-white/90 backdrop-blur-sm hover:bg-white"
+                  className="bg-green-500 hover:bg-green-600"
                 >
-                  <RotateCw className="h-4 w-4 text-gray-700" />
+                  <RotateCw className="h-4 w-4 text-white" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-64">
@@ -354,11 +395,11 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant="default"
                   size="sm"
-                  className="bg-white/90 backdrop-blur-sm hover:bg-white"
+                  className="bg-orange-500 hover:bg-orange-600"
                 >
-                  <Sliders className="h-4 w-4 text-gray-700" />
+                  <Sliders className="h-4 w-4 text-white" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-64">
@@ -405,32 +446,32 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
               </PopoverContent>
             </Popover>
             <Button
-              variant="ghost"
+              variant="default"
               size="sm"
-              className="bg-white/90 backdrop-blur-sm hover:bg-white"
+              className="bg-indigo-500 hover:bg-indigo-600"
               onClick={handleDownload}
             >
-              <Download className="h-4 w-4 text-gray-700" />
+              <Download className="h-4 w-4 text-white" />
             </Button>
             <Button
-              variant="ghost"
+              variant="default"
               size="sm"
-              className="bg-white/90 backdrop-blur-sm hover:bg-white"
+              className="bg-pink-500 hover:bg-pink-600"
               onClick={handleCopyPrompt}
             >
               {isCopied ? (
-                <Check className="h-4 w-4 text-gray-700" />
+                <Check className="h-4 w-4 text-white" />
               ) : (
-                <Copy className="h-4 w-4 text-gray-700" />
+                <Copy className="h-4 w-4 text-white" />
               )}
             </Button>
             <Button
-              variant="ghost"
+              variant="default"
               size="sm"
-              className="bg-white/90 backdrop-blur-sm hover:bg-white"
+              className="bg-teal-500 hover:bg-teal-600"
               onClick={handleShare}
             >
-              <Share2 className="h-4 w-4 text-gray-700" />
+              <Share2 className="h-4 w-4 text-white" />
             </Button>
           </div>
 
@@ -452,19 +493,18 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
           {/* Hidden canvas for final composition */}
           <canvas ref={canvasRef} className="hidden" />
 
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
         </>
       ) : (
         <p className="text-gray-400">Your generated image will appear here</p>
       )}
 
       <Button
-        variant="ghost"
+        variant="default"
         size="sm"
-        className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm hover:bg-white"
+        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600"
         onClick={onClose}
       >
-        <span className="text-gray-700">×</span>
+        <span className="text-white">×</span>
       </Button>
     </div>
   );
