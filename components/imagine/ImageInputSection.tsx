@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +20,8 @@ export default function ImageInputSection({
 }: ImageInputSectionProps) {
   const [prompt, setPrompt] = useState('');
   const [selectedStyle, setSelectedStyle] = useState('minimalist');
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [enhanceError, setEnhanceError] = useState<string | null>(null);
 
   const handleStyleChange = (style: string) => {
     setSelectedStyle(style);
@@ -74,6 +76,88 @@ export default function ImageInputSection({
           <div className="flex-1">
             <ImageStyleSelector onStyleChange={handleStyleChange} />
           </div>
+
+          {/* Enhance Button */}
+          <Button
+            type="button"
+            onClick={async () => {
+              setIsEnhancing(true);
+              setEnhanceError(null);
+              
+              try {
+                const response = await fetch('/api/enhance-prompt', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ prompt })
+                });
+
+                if (!response.ok) {
+                  throw new Error('Failed to enhance prompt');
+                }
+
+                const reader = response.body?.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                let enhancedPrompt = '';
+
+                while (reader) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+
+                  buffer += decoder.decode(value, { stream: true });
+                  const lines = buffer.split('\n');
+                  buffer = lines.pop() || '';
+
+                  for (const line of lines) {
+                    if (line.startsWith('data:')) {
+                      const json = line.slice(5).trim();
+                      if (json === '[DONE]') break;
+                      
+                      try {
+                        const data = JSON.parse(json);
+                        if (data.content) {
+                          enhancedPrompt += data.content;
+                          setPrompt(enhancedPrompt);
+                        }
+                      } catch (error) {
+                        console.error('Error parsing stream data:', error);
+                      }
+                    }
+                  }
+                }
+              } catch (error) {
+                console.error('Error enhancing prompt:', error);
+                setEnhanceError('Failed to enhance prompt. Please try again.');
+              } finally {
+                setIsEnhancing(false);
+              }
+            }}
+            disabled={!prompt.trim() || isEnhancing}
+            className={cn(
+              "h-12 w-32",
+              "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600",
+              "text-white font-medium",
+              "rounded-xl",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              "transition-all duration-200",
+              "flex items-center justify-center gap-2"
+            )}
+          >
+            {isEnhancing ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Sparkles className="w-4 h-4" />
+            )}
+            {isEnhancing ? 'Enhancing...' : 'Enhance'}
+          </Button>
+
+          {enhanceError && (
+            <div className="absolute bottom-20 left-4 right-4 text-red-500 text-sm">
+              {enhanceError}
+            </div>
+          )}
 
           {/* Generate Button */}
           <Button
