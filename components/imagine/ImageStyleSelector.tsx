@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 export const imageStyles = {
   'minimalist': {
     name: 'Minimalist',
@@ -35,11 +35,11 @@ export const imageStyles = {
     name: 'Hand Drawn',
     prompt: 'hand-drawn design, sketch style, organic shapes, artistic imperfections, creative illustration, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing'
   }
-  };
+};
 
 interface ImageStyleSelectorProps {
   onStyleChange: (style: string) => void;
-};
+}
 
 export default function ImageStyleSelector({ onStyleChange }: ImageStyleSelectorProps) {
   const [selectedStyle, setSelectedStyle] = useState('minimalist');
@@ -50,33 +50,30 @@ export default function ImageStyleSelector({ onStyleChange }: ImageStyleSelector
   };
 
   return (
-    <div className="space-y-2">
-      <Label>Image Style</Label>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="outline"
-            className="w-full flex items-center justify-between"
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="h-10 px-3 flex items-center justify-between gap-2"
+        >
+          <span className="text-sm">{imageStyles[selectedStyle as keyof typeof imageStyles].name}</span>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-48">
+        {Object.entries(imageStyles).map(([id, style]) => (
+          <DropdownMenuItem
+            key={id}
+            onClick={() => handleStyleSelect(id)}
+            className="text-sm flex items-center justify-between"
           >
-            <span>{imageStyles[selectedStyle as keyof typeof imageStyles].name}</span>
-            <ChevronDown className="h-4 w-4 ml-2" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-64">
-          {Object.entries(imageStyles).map(([id, style]) => (
-            <DropdownMenuItem
-              key={id}
-              onClick={() => handleStyleSelect(id)}
-              className="flex items-center justify-between"
-            >
-              <span>{style.name}</span>
-              {selectedStyle === id && (
-                <Check className="h-4 w-4 text-primary" />
-              )}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+            <span>{style.name}</span>
+            {selectedStyle === id && (
+              <Check className="h-4 w-4 text-primary" />
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

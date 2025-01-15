@@ -14,7 +14,6 @@ export default function ImageOptionsMenu({
   return (
     <div className="space-y-6">
       <ImageStyleSelector onStyleChange={onStyleChange} />
-
     </div>
   );
 }
