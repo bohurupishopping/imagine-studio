@@ -86,7 +86,7 @@ export default function GeneratePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Input Section */}
           <motion.div 
-            className="lg:col-span-8"
+            className="lg:col-span-6"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -112,7 +112,7 @@ export default function GeneratePage() {
 
           {/* Preview Section */}
           <motion.div 
-            className="lg:col-span-4"
+            className="lg:col-span-6"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
