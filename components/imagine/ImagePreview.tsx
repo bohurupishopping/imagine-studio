@@ -57,7 +57,8 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
   // Download functionality
   const handleDownload = async () => {
     try {
-      const response = await fetch(src);
+      const proxyUrl = `/api/download-image?url=${encodeURIComponent(src)}`;
+      const response = await fetch(proxyUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -124,7 +125,7 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
   };
 
   return (
-    <div className="w-full h-[600px] bg-gray-100 rounded-lg flex items-center justify-center relative p-4">
+    <div className="w-full h-[300px] md:h-[600px] bg-gray-100 rounded-lg flex items-center justify-center relative p-4">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">
           <p className="text-gray-400">Loading image...</p>
