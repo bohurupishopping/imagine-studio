@@ -64,38 +64,18 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-white via-purple-50 to-blue-50 p-2 sm:p-4">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-white via-purple-50 to-blue-50 px-1 sm:px-2 pb-2 lg:px-1 lg:pb-1">
       <div className="max-w-7xl mx-auto h-full flex flex-col">
-        {/* Header Section */}
-        <motion.div 
-          className="flex justify-center p-4 pb-2"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <div className="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-blue-50 px-8 py-4 rounded-full border border-purple-100 shadow-lg hover:shadow-xl transition-all duration-300 group">
-            <motion.div
-              className="p-2 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg group-hover:scale-110 transition-transform"
-              whileHover={{ rotate: 15 }}
-            >
-              <Sparkles className="w-7 h-7 text-purple-600 group-hover:text-purple-700 transition-colors" />
-            </motion.div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Imagine
-            </h1>
-          </div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-4 flex-1 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 flex-1 overflow-hidden">
           {/* Input Section */}
           <motion.div 
-            className="lg:col-span-6"
+            className="lg:col-span-4"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
           >
             <Card className="border border-gray-100 bg-white h-full flex flex-col hover:shadow-xl transition-shadow duration-300">
-              <CardHeader className="space-y-2 p-4 sm:p-6 pb-2 sm:pb-4">
+              <CardHeader className="space-y-3 p-2 sm:p-3 pb-1 sm:pb-2 lg:p-2 lg:pb-1">
                 <div className="flex items-center gap-3">
                   <motion.div
                     className="p-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg hover:scale-105 transition-transform"
@@ -113,7 +93,7 @@ export default function GeneratePage() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1 p-4 sm:p-6 pt-0 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-transparent">
+              <CardContent className="flex-1 p-3 sm:p-4 pt-0 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-200 scrollbar-track-transparent lg:p-3">
                 <ImageInputSection
                   onGenerate={handleGenerate}
                   isLoading={isLoading}
@@ -124,13 +104,13 @@ export default function GeneratePage() {
 
           {/* Preview Section */}
           <motion.div 
-            className="lg:col-span-6"
+            className="lg:col-span-8"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 }}
           >
             <Card className="border border-gray-100 bg-white h-full flex flex-col hover:shadow-xl transition-shadow duration-300">
-              <CardHeader className="space-y-2 p-4 sm:p-6 pb-2 sm:pb-4">
+              <CardHeader className="space-y-3 p-3 sm:p-4 pb-2 sm:pb-4 lg:p-3 lg:pb-2">
                 <div className="flex items-center gap-3">
                   <motion.div
                     className="p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg hover:scale-105 transition-transform"
@@ -148,11 +128,12 @@ export default function GeneratePage() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1 p-4 sm:p-6 pt-0 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent">
+              <CardContent className="flex-1 p-3 sm:p-4 pt-0 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-transparent lg:p-3">
                 <motion.div
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ duration: 0.3 }}
+                  className="h-full"
                 >
                   <ImagePreview
                     src={generatedImage || ''}

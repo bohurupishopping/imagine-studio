@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Download, Copy, Check, Share2, Plus, Crop, RotateCw, Sliders } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { TextOverlay } from './TextOverlay';
+import { TextOverlay } from './editor/TextOverlay';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
