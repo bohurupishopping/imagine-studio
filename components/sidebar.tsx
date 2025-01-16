@@ -57,7 +57,11 @@ const NavItem = memo(({ item, currentPath }: NavItemProps) => (
 
 NavItem.displayName = 'NavItem';
 
-const SidebarContent = memo(() => {
+interface SidebarContentProps {
+  currentPath: string;
+}
+
+const SidebarContent = memo(({ currentPath }: SidebarContentProps) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -142,7 +146,7 @@ const SidebarContent = memo(() => {
                   <NavItem
                     key={item.href}
                     item={item}
-                    currentPath={window.location.pathname}
+                    currentPath={currentPath}
                   />
                 ))}
               </div>
@@ -160,7 +164,7 @@ const SidebarContent = memo(() => {
                   <NavItem
                     key={item.href}
                     item={item}
-                    currentPath={window.location.pathname}
+                    currentPath={currentPath}
                   />
                 ))}
               </div>
@@ -238,7 +242,7 @@ export function Sidebar({ currentPath }: SidebarProps) {
       'text-foreground',
       'hidden lg:block' // Hide on mobile, show on desktop (lg breakpoint)
     )}>
-      <SidebarContent />
+      <SidebarContent currentPath={currentPath} />
     </aside>
   );
 }

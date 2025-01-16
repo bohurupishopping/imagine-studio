@@ -1,22 +1,26 @@
+'use client';
+
 import { Sidebar } from '@/components/sidebar';
-import { cn } from '@/lib/utils';
+import { MobileFooter } from '@/components/mobile-footer';
+import { motion } from 'framer-motion';
 
 export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="flex">
-        <Sidebar />
-        <main className={cn(
-          'flex-1 p-6 transition-all duration-300',
-          'ml-0 lg:ml-64' // Adjust margin based on sidebar width
-        )}>
-          {children}
-        </main>
-      </div>
+    <div className="flex min-h-screen bg-gradient-to-br from-white via-purple-50 to-blue-50">
+      <Sidebar currentPath="/dashboard" />
+      <motion.main 
+        className="flex-1 md:ml-64 p-4 md:p-8 pb-20 md:pb-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        {children}
+      </motion.main>
+      <MobileFooter />
     </div>
   );
 }
