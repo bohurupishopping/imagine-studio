@@ -94,98 +94,74 @@ export function TextOverlay({
               {text}
             </div>
           </PopoverTrigger>
-          <PopoverContent className="w-80">
+          <PopoverContent className="w-72 p-4 bg-gradient-to-br from-purple-100/95 via-pink-100/95 to-blue-100/95 backdrop-blur-2xl border-2 border-white/30 rounded-2xl shadow-2xl">
             <div className="grid gap-4">
-              <div className="space-y-2">
-                <h4 className="font-medium leading-none">Text Settings</h4>
-                <p className="text-sm text-muted-foreground">
+              <div className="space-y-1.5">
+                <h4 className="font-bold text-sm bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  Text Settings
+                </h4>
+                <p className="text-xs text-purple-800/90">
                   Customize your text overlay
                 </p>
               </div>
-              <div className="grid gap-2">
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="text">Text</Label>
+              <div className="grid gap-2.5">
+                <div className="grid grid-cols-3 items-center gap-2.5">
+                  <Label htmlFor="text" className="text-xs font-medium text-purple-800/90">Text</Label>
                   <Input
                     id="text"
                     value={text}
                     onChange={(e) => onTextChange(e.target.value)}
-                    className="col-span-2 h-8"
+                    className="col-span-2 h-8 text-xs bg-white/90 border-purple-200/50 hover:border-purple-300 focus:border-purple-400 focus:ring-1 focus:ring-purple-200"
                   />
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="fontSize">Size</Label>
+                <div className="grid grid-cols-3 items-center gap-2.5">
+                  <Label htmlFor="fontSize" className="text-xs font-medium text-purple-800/90">Size</Label>
                   <Slider
                     id="fontSize"
                     defaultValue={[fontSize]}
                     min={12}
                     max={72}
                     step={1}
-                    onValueChange={([value]) => 
+                    onValueChange={([value]) =>
                       onStyleChange({ fontSize: value, color })
                     }
-                    className="col-span-2"
+                    className="col-span-2 h-3 bg-purple-100/50 [&>div]:bg-gradient-to-r from-purple-400 to-blue-400"
                   />
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="color">Color</Label>
+                <div className="grid grid-cols-3 items-center gap-2.5">
+                  <Label htmlFor="color" className="text-xs font-medium text-purple-800/90">Color</Label>
                   <Input
                     type="color"
                     id="color"
                     value={color}
-                    onChange={(e) => 
+                    onChange={(e) =>
                       onStyleChange({ fontSize, color: e.target.value })
                     }
-                    className="col-span-2 h-8 p-1"
+                    className="col-span-2 h-8 p-0.5 bg-white/90 border-purple-200/50 hover:border-purple-300 focus:border-purple-400 focus:ring-1 focus:ring-purple-200 rounded-lg"
                   />
-                </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label>Alignment</Label>
-                  <div className="col-span-2 flex gap-2">
-                    <Button
-                      variant={textAlign === 'left' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setTextAlign('left')}
-                    >
-                      Left
-                    </Button>
-                    <Button
-                      variant={textAlign === 'center' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setTextAlign('center')}
-                    >
-                      Center
-                    </Button>
-                    <Button
-                      variant={textAlign === 'right' ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setTextAlign('right')}
-                    >
-                      Right
-                    </Button>
-                  </div>
                 </div>
                 <div className="grid grid-cols-3 items-center gap-4">
                   <Label htmlFor="bgColor">Background</Label>
-                  <Input
-                    type="color"
-                    id="bgColor"
-                    value={backgroundColor}
-                    onChange={(e) => setBackgroundColor(e.target.value)}
-                    className="col-span-2 h-8 p-1"
-                  />
+                  <div className="col-span-2 flex gap-2">
+                    <Input
+                      type="color"
+                      id="bgColor"
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="h-8 p-1 bg-white/90 border-purple-200/50 hover:border-purple-300 focus:border-purple-400 focus:ring-1 focus:ring-purple-200 rounded-lg flex-1"
+                    />
+                    <Button
+                      variant={backgroundColor === 'transparent' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setBackgroundColor('transparent')}
+                      className="h-8 px-3 text-xs font-medium"
+                    >
+                      Transparent
+                    </Button>
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="shadow">Shadow</Label>
-                  <Input
-                    id="shadow"
-                    value={textShadow}
-                    onChange={(e) => setTextShadow(e.target.value)}
-                    placeholder="e.g. 2px 2px 4px #000"
-                    className="col-span-2 h-8"
-                  />
-                </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="rotation">Rotation</Label>
+                <div className="grid grid-cols-3 items-center gap-2.5">
+                  <Label htmlFor="rotation" className="text-xs font-medium text-purple-800/90">Rotation</Label>
                   <Slider
                     id="rotation"
                     defaultValue={[rotation]}
@@ -193,11 +169,11 @@ export function TextOverlay({
                     max={180}
                     step={1}
                     onValueChange={([value]) => setRotation(value)}
-                    className="col-span-2"
+                    className="col-span-2 h-3 bg-purple-100/50 [&>div]:bg-gradient-to-r from-purple-400 to-blue-400"
                   />
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="positionX">Horizontal</Label>
+                <div className="grid grid-cols-3 items-center gap-2.5">
+                  <Label htmlFor="positionX" className="text-xs font-medium text-purple-800/90">Horizontal</Label>
                   <Slider
                     id="positionX"
                     value={[position.x]}
@@ -205,11 +181,11 @@ export function TextOverlay({
                     max={100}
                     step={1}
                     onValueChange={([value]) => onPositionChange({ x: value, y: position.y })}
-                    className="col-span-2"
+                    className="col-span-2 h-3 bg-purple-100/50 [&>div]:bg-gradient-to-r from-purple-400 to-blue-400"
                   />
                 </div>
-                <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="positionY">Vertical</Label>
+                <div className="grid grid-cols-3 items-center gap-2.5">
+                  <Label htmlFor="positionY" className="text-xs font-medium text-purple-800/90">Vertical</Label>
                   <Slider
                     id="positionY"
                     value={[position.y]}
@@ -217,7 +193,7 @@ export function TextOverlay({
                     max={100}
                     step={1}
                     onValueChange={([value]) => onPositionChange({ x: position.x, y: value })}
-                    className="col-span-2"
+                    className="col-span-2 h-3 bg-purple-100/50 [&>div]:bg-gradient-to-r from-purple-400 to-blue-400"
                   />
                 </div>
               </div>

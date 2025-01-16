@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Download, Copy, Check, Share2, Plus, Crop, RotateCw, Sliders } from 'lucide-react';
+import { Download, Copy, Check, Share2, Plus, Sliders } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { TextOverlay } from './editor/TextOverlay';
 import { Slider } from '@/components/ui/slider';
@@ -32,8 +32,6 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [textOverlays, setTextOverlays] = useState<TextOverlayData[]>([]);
-  const [crop, setCrop] = useState({ x: 0, y: 0, width: 1, height: 1 });
-  const [rotation, setRotation] = useState(0);
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
   const [saturation, setSaturation] = useState(100);
@@ -157,20 +155,6 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
       // Apply transformations
       ctx.save();
       
-      // Apply crop
-      ctx.beginPath();
-      ctx.rect(
-        crop.x * naturalWidth,
-        crop.y * naturalHeight,
-        crop.width * naturalWidth,
-        crop.height * naturalHeight
-      );
-      ctx.clip();
-
-      // Apply rotation
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate((rotation * Math.PI) / 180);
-      ctx.translate(-canvas.width / 2, -canvas.height / 2);
 
       // Apply filters
       applyFilters(ctx);
@@ -268,7 +252,7 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
     <div className="w-full h-[500px] md:h-[600px] bg-white rounded-lg flex items-center justify-center relative p-4">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <p className="text-gray-400">Loading image...</p>
+          
         </div>
       )}
 
@@ -321,77 +305,6 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
             >
               <Plus className="h-4 w-4 text-white" />
             </Button>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="bg-purple-500 hover:bg-purple-600"
-                >
-                  <Crop className="h-4 w-4 text-white" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64">
-                <div className="grid gap-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium leading-none">Crop</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Adjust image cropping
-                    </p>
-                  </div>
-                  <div className="grid gap-2">
-                    <Slider
-                      value={[crop.width]}
-                      min={0.1}
-                      max={1}
-                      step={0.01}
-                      onValueChange={([value]) => 
-                        setCrop(prev => ({ ...prev, width: value }))
-                      }
-                    />
-                    <Slider
-                      value={[crop.height]}
-                      min={0.1}
-                      max={1}
-                      step={0.01}
-                      onValueChange={([value]) => 
-                        setCrop(prev => ({ ...prev, height: value }))
-                      }
-                    />
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="bg-green-500 hover:bg-green-600"
-                >
-                  <RotateCw className="h-4 w-4 text-white" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64">
-                <div className="grid gap-4">
-                  <div className="space-y-2">
-                    <h4 className="font-medium leading-none">Rotate</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Adjust image rotation
-                    </p>
-                  </div>
-                  <div className="grid gap-2">
-                    <Slider
-                      value={[rotation]}
-                      min={-180}
-                      max={180}
-                      step={1}
-                      onValueChange={([value]) => setRotation(value)}
-                    />
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
             <Popover>
               <PopoverTrigger asChild>
                 <Button

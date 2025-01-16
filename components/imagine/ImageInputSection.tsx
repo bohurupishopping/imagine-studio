@@ -53,13 +53,16 @@ export default function ImageInputSection({
             }}
             placeholder="Describe your image..."
             className={cn(
-              "w-full min-h-[80px] max-h-[140px] py-2 px-3",
-              "bg-transparent",
-              "border-0 outline-0 focus:outline-0 ring-0 focus:ring-0 focus:ring-offset-0",
+              "w-full min-h-[100px] max-h-[160px] py-3 px-4",
+              "bg-gradient-to-b from-white/50 to-white/20 dark:from-gray-800/50 dark:to-gray-800/20",
+              "border border-gray-200 dark:border-gray-700",
+              "rounded-lg",
               "resize-none",
               "text-gray-700 dark:text-gray-200",
               "placeholder:text-gray-400 dark:placeholder:text-gray-500",
               "text-[14px] leading-snug",
+              "focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+              "transition-all duration-200",
               "[&::-webkit-scrollbar]:hidden",
               "[-ms-overflow-style:none]",
               "[scrollbar-width:none]"
@@ -137,19 +140,19 @@ export default function ImageInputSection({
             }}
             disabled={!prompt.trim() || isEnhancing}
             className={cn(
-              "h-10 w-28",
+              "h-9 w-24",
               "bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600",
-              "text-white text-sm font-medium",
+              "text-white text-xs font-medium",
               "rounded-lg",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               "transition-all duration-200",
-              "flex items-center justify-center gap-1.5"
+              "flex items-center justify-center gap-1"
             )}
           >
             {isEnhancing ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-3.5 h-3.5" />
             )}
             {isEnhancing ? 'Enhancing...' : 'Enhance'}
           </Button>
@@ -166,30 +169,29 @@ export default function ImageInputSection({
             onClick={() => onGenerate(prompt)}
             disabled={isLoading || !prompt.trim()}
             className={cn(
-              "h-10 w-40",
+              "h-9 w-32",
               "bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600",
-              "text-white text-sm font-medium",
+              "text-white text-xs font-medium",
               "rounded-lg",
               "disabled:opacity-50 disabled:cursor-not-allowed",
               "transition-all duration-200",
-              "flex items-center justify-center gap-1.5"
+              "flex items-center justify-center gap-1"
             )}
           >
             {isLoading ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
                 Generating...
               </>
             ) : (
               <>
-                <Sparkles className="w-5 h-5" />
+                <Sparkles className="w-3.5 h-3.5" />
                 Generate
               </>
             )}
           </Button>
+        </div>
       </div>
-
-    </div>
     </div>
   );
 }
