@@ -16,6 +16,7 @@ import { Loader2, Sparkles } from 'lucide-react';
 export default function AuthPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -56,7 +57,10 @@ export default function AuthPage() {
           password,
           options: {
             emailRedirectTo: `${location.origin}/auth/callback`,
-            data: { remember_me: rememberMe },
+            data: { 
+              remember_me: rememberMe,
+              display_name: displayName 
+            },
           },
         });
         if (error) throw error;
@@ -125,10 +129,31 @@ export default function AuthPage() {
                   </div>
                 </motion.div>
               )}
+              {!isLogin && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <div className="space-y-2">
+                    <Label htmlFor="displayName">Display Name</Label>
+                    <Input
+                      id="displayName"
+                      type="text"
+                      placeholder="Your name"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      required={!isLogin}
+                      className="focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                </motion.div>
+              )}
+
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.5 }}
               >
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
