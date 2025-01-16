@@ -6,8 +6,11 @@ import { Toaster } from '@/components/ui/sonner';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Next.js Auth',
-  description: 'Authentication with Next.js and Supabase',
+  title: 'Bohurupi Imagine | Create AI T-shirt',
+  description: 'Create unique AI-designed T-shirts instantly. Customize designs, colors, and styles with our powerful AI tools. Perfect for personal or business use.',
+  icons: {
+    icon: '/assets/ai-icon.png',
+  },
 };
 
 export default function RootLayout({
