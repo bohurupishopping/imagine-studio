@@ -7,16 +7,31 @@ export async function middleware(request: NextRequest) {
   const supabase = createMiddlewareClient({ req: request, res: response });
 
   const { data: { session } } = await supabase.auth.getSession();
-  const rememberMe = request.cookies.get('remember_me')?.value === 'true';
-
-  // Redirect to dashboard if logged in
-  if (session && request.nextUrl.pathname === '/') {
+  
+  // Public routes that don't require authentication
+  const publicRoutes = ['/', '/auth/callback'];
+  
+  // Redirect authenticated users away from auth pages
+  if (session && publicRoutes.includes(request.nextUrl.pathname)) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // Redirect to login if not logged in and remember me is not set
-  if (!session && !rememberMe && request.nextUrl.pathname.startsWith('/dashboard')) {
+  // Protected routes
+  const protectedRoutes = ['/dashboard', '/imagine', '/settings'];
+  
+  // Redirect unauthenticated users from protected routes
+  if (!session && protectedRoutes.some(route =>
+    request.nextUrl.pathname.startsWith(route)
+  )) {
     return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  // Set auth header for API routes
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    response.headers.set(
+      'Authorization',
+      `Bearer ${session?.access_token}`
+    );
   }
 
   return response;

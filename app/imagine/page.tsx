@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -9,12 +9,26 @@ import ImageOptionsMenu from '@/components/imagine/ImageOptionsMenu';
 import ImagePreview from '@/components/imagine/ImagePreview';
 import { imagineService } from '@/services/imagineService';
 import { Sparkles, Wand2, Image as ImageIcon } from 'lucide-react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
 
 export default function GeneratePage() {
   const { toast } = useToast();
+  const router = useRouter();
+  const supabase = createClientComponentClient();
   const [isLoading, setIsLoading] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [generatedPrompt, setGeneratedPrompt] = useState('');
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/');
+      }
+    };
+    checkSession();
+  }, [supabase, router]);
 
   const handleGenerate = async (prompt: string) => {
     if (!prompt.trim()) {
