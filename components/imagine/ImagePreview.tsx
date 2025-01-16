@@ -265,7 +265,7 @@ export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreview
   };
 
   return (
-    <div className="w-full h-[300px] md:h-[600px] bg-white rounded-lg flex items-center justify-center relative p-4">
+    <div className="w-full h-[500px] md:h-[600px] bg-white rounded-lg flex items-center justify-center relative p-4">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center">
           <p className="text-gray-400">Loading image...</p>
