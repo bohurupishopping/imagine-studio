@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,23 +54,59 @@ export default function ImageStyleSelector({ onStyleChange }: ImageStyleSelector
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
-          className="h-10 px-3 flex items-center justify-between gap-2"
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "h-8 w-[120px] px-2",
+            "flex items-center justify-between gap-1.5",
+            "rounded-full",
+            "bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900",
+            "border border-gray-200/80 dark:border-gray-700/80",
+            "hover:border-blue-300/50 dark:hover:border-blue-700/50",
+            "hover:shadow-[0_2px_8px_rgba(59,130,246,0.15)]",
+            "dark:hover:shadow-[0_2px_8px_rgba(59,130,246,0.1)]",
+            "group transition-all duration-200"
+          )}
         >
-          <span className="text-sm">{imageStyles[selectedStyle as keyof typeof imageStyles].name}</span>
-          <ChevronDown className="h-4 w-4 opacity-50" />
+          <span className="text-xs font-medium text-gray-700 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            {imageStyles[selectedStyle as keyof typeof imageStyles].name}
+          </span>
+          <ChevronDown className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48">
+      <DropdownMenuContent
+        align="end"
+        className={cn(
+          "w-[180px] p-1.5",
+          "bg-white/95 dark:bg-gray-800/95",
+          "border border-gray-200/50 dark:border-gray-700/50",
+          "backdrop-blur-md",
+          "animate-in zoom-in-90 duration-100"
+        )}
+      >
         {Object.entries(imageStyles).map(([id, style]) => (
           <DropdownMenuItem
             key={id}
             onClick={() => handleStyleSelect(id)}
-            className="text-sm flex items-center justify-between"
+            className={cn(
+              "text-sm flex items-center justify-between",
+              "px-3 py-2 rounded-md",
+              "text-gray-700 dark:text-gray-300",
+              "relative",
+              selectedStyle === id && [
+                "bg-gradient-to-r from-blue-50/80 to-blue-50/40",
+                "dark:from-blue-900/20 dark:to-blue-900/10",
+                "text-blue-600 dark:text-blue-400",
+                "font-medium"
+              ],
+              "hover:bg-gray-50 dark:hover:bg-gray-800/50",
+              "transition-all duration-150 ease-in-out",
+              "cursor-default select-none"
+            )}
           >
             <span>{style.name}</span>
             {selectedStyle === id && (
-              <Check className="h-4 w-4 text-primary" />
+              <Check className="h-3.5 w-3.5" />
             )}
           </DropdownMenuItem>
         ))}
