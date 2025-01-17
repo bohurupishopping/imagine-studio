@@ -103,25 +103,26 @@ Key Considerations:
 Simplicity: Avoid image modifications; focus solely on text.
 Fonts: Preload local fonts for smooth rendering.
 Error Handling: Ensure fonts and colors are correctly mapped to the preview.
-
+**Completed and Tested**
 
 3. Order Details Page
-Objective: Validate WooCommerce orders and store all design-related data for the order on a new supabase database table "order".
+Objective: Showcase all saved data for the user from the database table on this page, then Validate WooCommerce orders and store all order & design-related data for the order on a new supabase database table "order".
  
 
 Page Flow:
 User Interface:
-
-Display an input field for the order ID & main id optional,  
-Once entered and Next Button, show fetched order details (e.g., order status, items, total cost). on a table and another table we'll showcase design details from supabase that just saved in the previous page, 
+Display on a table (card) we'll showcase design details from supabase that just saved in the previous page (app\imagine\page.tsx), 
+Display an input field for the order ID & mail id optional,  
+Once entered and Fetch Button, show fetched order details (e.g., order status, items, total cost). 
  
-Provide a "Place Order" button for save the data to the new table called "order", and redirect user to the confirmation page, 
+Provide a "Place Order" button for save the all the design table data (learn table sql :sql\designs.sql) and order data to the new table called "order", and redirect user to the confirmation page, 
 
 
 Backend Actions:
+1. Fetch "design" details from the supabase db table for the user id, 
+2. Fetch order details from the WooCommerce REST API:
+3. Validate the order ID and ensure the payment status is completed/paid.
 
-Fetch order details from the WooCommerce REST API:
-Validate the order ID and ensure the payment status is completed/paid.
 Combine data:
 Image URL (from Supabase Storage).
 Text customization details (from Supabase database).
