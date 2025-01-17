@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import ImageInputSection from '@/components/imagine/ImageInputSection';
 import ImagePreview from '@/components/imagine/ImagePreview';
 import { imagineService } from '@/services/imagineService';
-import { Wand2, Image as ImageIcon } from 'lucide-react';
+import { Wand2, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { TextCustomizationPopup } from '@/components/imagine/TextCustomizationPopup';
@@ -141,13 +141,10 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative bg-white/30 backdrop-blur-[16px]">
-      <div className="absolute inset-0 rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-br from-blue-500/20 via-purple-500/15 to-pink-500/20 opacity-60 pointer-events-none animate-gradient" />
-      <div className="absolute inset-0 bg-white/5 backdrop-blur-3xl pointer-events-none" />
-      
-      <div className="max-w-7xl mx-auto flex flex-col min-h-[calc(100vh-4rem)] relative z-10">
+    <div className="min-h-[calc(100vh-4rem)] relative bg-gradient-to-b from-white via-purple-50/30 to-blue-50/30">
+      <div className="max-w-7xl mx-auto flex flex-col min-h-[calc(100dvh-4rem)] relative z-10">
         {/* Main Preview Area */}
-        <div className="flex-1 p-4 overflow-auto">
+        <div className="flex-1 p-2 sm:p-4 overflow-auto">
           <motion.div
             className="w-full max-w-6xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
@@ -155,9 +152,15 @@ export default function GeneratePage() {
             transition={{ delay: 0.2 }}
           >
             {generatedImages.length > 0 ? (
-              <Card className="border border-white/30 bg-white/40 backdrop-blur-2xl shadow-lg hover:shadow-2xl transition-all duration-300 rounded-2xl">
-                <CardContent className="p-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="border-none bg-white/80 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl overflow-hidden">
+                <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-purple-50 to-blue-50 p-4">
+                  <CardTitle className="text-lg font-medium text-gray-700 flex items-center gap-2">
+                    <Wand2 className="w-5 h-5 text-purple-500" />
+                    Generated Designs
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 sm:p-6 bg-white/40">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {generatedImages.map((image, index) => (
                       <motion.div
                         key={index}
@@ -186,7 +189,7 @@ export default function GeneratePage() {
                                 image.saved 
                                   ? 'from-green-600 to-green-700 hover:from-green-700 hover:to-green-800' 
                                   : 'from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
-                              } text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]`}
+                              } text-white px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]`}
                               onClick={() => {
                                 if (image.saved) {
                                   setSelectedImage({
@@ -225,32 +228,22 @@ export default function GeneratePage() {
           </motion.div>
         </div>
 
-        {/* Footer Input Section */}
+        {/* Input Section */}
         <motion.div
-          className="w-full bg-white/50 backdrop-blur-xl border-t border-white/20 py-4 px-4 sticky bottom-0"
+          className="w-full backdrop-blur-xl border-t border-gray-100 py-2 md:py-6 px-2 md:px-4 bg-gradient-to-b from-white/80 via-white to-white"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <div className="max-w-4xl mx-auto">
-            <Card className="border border-white/30 bg-white/40 backdrop-blur-2xl shadow-lg rounded-2xl overflow-hidden">
-              <CardHeader className="p-4 border-b border-white/10">
-                <div className="flex items-center gap-3">
-                  <motion.div
-                    className="p-2.5 bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl"
-                    whileHover={{ rotate: 15, scale: 1.1 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 10 }}
-                  >
-                    <Wand2 className="w-6 h-6 text-purple-600" />
-                  </motion.div>
-                  <div>
-                    <CardTitle className="text-xl font-bold bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent">
-                      Create New Image
-                    </CardTitle>
-                  </div>
-                </div>
+          <div className="w-full px-2 md:max-w-4xl mx-auto mt-4 md:mt-8">
+            <Card className="w-full border border-gray-100 shadow-lg rounded-xl md:rounded-2xl overflow-hidden">
+              <CardHeader className="p-4 border-b border-gray-50 bg-gradient-to-r from-purple-50 to-blue-50">
+                <CardTitle className="text-lg font-medium text-gray-700 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-purple-500" />
+                  Create New Design
+                </CardTitle>
               </CardHeader>
-              <CardContent className="p-4">
+              <CardContent className="p-6 bg-white">
                 <ImageInputSection
                   onGenerate={handleGenerate}
                   isLoading={isLoading}
