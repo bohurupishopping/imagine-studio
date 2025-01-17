@@ -6,7 +6,7 @@ const CONSUMER_SECRET = process.env.WOO_CONSUMER_SECRET;
 
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Record<string, string> }
 ) {
   const { id } = context.params;
 
