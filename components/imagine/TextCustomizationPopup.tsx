@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,6 +63,8 @@ export function TextCustomizationPopup({
   const [isSaving, setIsSaving] = useState(false);
   const [showText2, setShowText2] = useState(false);
 
+  const router = useRouter();
+
   const handleSave = useCallback(async () => {
     if (!text1.trim() && !text2.trim()) {
       toast({
@@ -91,6 +94,7 @@ export function TextCustomizationPopup({
         description: 'Text customization saved!',
       });
       onClose();
+      router.push('/order');
     } catch (error) {
       console.error('Error saving text:', error);
       toast({

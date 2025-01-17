@@ -322,6 +322,9 @@ export default function GeneratePage() {
                   .eq('image_url', selectedImage.filePath);
 
                 if (error) throw error;
+                
+                // Navigate to order page after successful save
+                router.push('/order');
               } catch (error) {
                 console.error('Error saving text customization:', error);
                 throw error;

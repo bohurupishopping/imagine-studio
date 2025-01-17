@@ -106,14 +106,18 @@ Error Handling: Ensure fonts and colors are correctly mapped to the preview.
 
 
 3. Order Details Page
-Objective: Validate WooCommerce orders and store all design-related data for the order.
+Objective: Validate WooCommerce orders and store all design-related data for the order on a new supabase database table "order".
+ 
 
 Page Flow:
 User Interface:
 
-Display an input field for the order ID.
-Show fetched order details (e.g., order status, items, total cost) once entered.
-Provide a "Place Order" button.
+Display an input field for the order ID & main id optional,  
+Once entered and Next Button, show fetched order details (e.g., order status, items, total cost). on a table and another table we'll showcase design details from supabase that just saved in the previous page, 
+ 
+Provide a "Place Order" button for save the data to the new table called "order", and redirect user to the confirmation page, 
+
+
 Backend Actions:
 
 Fetch order details from the WooCommerce REST API:
@@ -133,6 +137,8 @@ Key Considerations:
 Order Validation: Only allow paid orders to proceed.
 Error Handling: Handle invalid order IDs or API failures gracefully.
 Data Integrity: Ensure all combined data (image, text, order) is stored correctly.
+
+
 4. Order Placement Page
 Objective: Finalize the order and confirm placement.
 
