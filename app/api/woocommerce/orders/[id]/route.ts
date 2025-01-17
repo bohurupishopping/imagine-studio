@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { WooCommerceOrder } from "@/types/woocommerce";
 
 const CONSUMER_KEY = process.env.WOO_CONSUMER_KEY;
 const CONSUMER_SECRET = process.env.WOO_CONSUMER_SECRET;
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { id } = params;
