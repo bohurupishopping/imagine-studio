@@ -100,7 +100,7 @@ const SidebarContent = memo(({ currentPath }: SidebarContentProps) => {
   const mainItems = [
     { href: '/dashboard', icon: <LayoutDashboard className="h-6 w-6" />, label: 'Dashboard' },
     { href: '/imagine', icon: <Image className="h-6 w-6" />, label: 'Generate' },
-    { href: '/dashboard/history', icon: <History className="h-6 w-6" />, label: 'History' },
+    { href: '/order', icon: <History className="h-6 w-6" />, label: 'View Order' },
   ];
 
   const supportItems = [
