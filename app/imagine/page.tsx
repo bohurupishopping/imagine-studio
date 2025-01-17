@@ -5,10 +5,9 @@ import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import ImageInputSection from '@/components/imagine/ImageInputSection';
-import ImageOptionsMenu from '@/components/imagine/ImageOptionsMenu';
 import ImagePreview from '@/components/imagine/ImagePreview';
 import { imagineService } from '@/services/imagineService';
-import { Sparkles, Wand2, Image as ImageIcon } from 'lucide-react';
+import { Wand2, Image as ImageIcon } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 
@@ -17,8 +16,13 @@ export default function GeneratePage() {
   const router = useRouter();
   const supabase = createClientComponentClient();
   const [isLoading, setIsLoading] = useState(false);
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-  const [generatedPrompt, setGeneratedPrompt] = useState('');
+  const [generatedImages, setGeneratedImages] = useState<Array<{
+    url: string;
+    prompt: string;
+    timestamp: number;
+    saved?: boolean;
+  }>>([]);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -48,8 +52,12 @@ export default function GeneratePage() {
       });
 
       if (response.success && response.data[0]?.url) {
-        setGeneratedImage(response.data[0].url);
-        setGeneratedPrompt(prompt);
+        const newImage = {
+          url: response.data[0].url,
+          prompt,
+          timestamp: Date.now()
+        };
+        setGeneratedImages(prev => [newImage, ...prev]);
         toast({
           title: 'Success',
           description: 'Image generated successfully!',
@@ -69,12 +77,61 @@ export default function GeneratePage() {
     }
   };
 
-  const handleStyleChange = (style: string) => {
-    console.log('Selected style:', style);
-  };
+  const handleSaveImage = async (imageUrl: string) => {
+    setIsLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('No active session');
+      }
 
-  const handleQualityChange = (quality: string) => {
-    console.log('Selected quality:', quality);
+      // Validate image URL
+      if (!imageUrl || !imageUrl.startsWith('https://')) {
+        throw new Error('Invalid image URL');
+      }
+
+      // Get the existing image URL from generated images
+      const existingImage = generatedImages.find(img => img.url === imageUrl);
+      if (!existingImage) {
+        throw new Error('Image not found in generated images');
+      }
+
+      // Use the existing image URL from the generated image
+      const publicUrl = existingImage.url;
+      const filePath = publicUrl.split('/storage/v1/object/public/t-shirt-designs/')[1];
+
+      // Save metadata to Supabase database
+      const { error: dbError } = await supabase
+        .from('designs')
+        .insert({
+          user_id: session.user.id,
+          image_url: filePath,
+          public_url: publicUrl,
+          prompt: existingImage.prompt,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select();
+
+      if (dbError) throw dbError;
+
+      // Update local state to mark image as saved
+      setGeneratedImages(prev => prev.map(img => 
+        img.url === imageUrl ? { ...img, saved: true } : img
+      ));
+
+      // Navigate to Text Customization Page
+      router.push(`/imagine/customize?image=${encodeURIComponent(filePath)}`);
+    } catch (error) {
+      console.error('Error saving image:', error);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to save image',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -149,17 +206,76 @@ export default function GeneratePage() {
                   transition={{ duration: 0.3 }}
                   className="h-full"
                 >
-                  <ImagePreview
-                    src={generatedImage || ''}
-                    alt="Generated image preview"
-                    prompt={generatedPrompt}
-                    onClose={() => setGeneratedImage(null)}
-                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 p-4">
+                    {generatedImages.map((image, index) => (
+                      <div 
+                        key={index}
+                        className="relative group rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]"
+                      >
+                        <div className="border-b border-gray-100 pb-4">
+                          <div 
+                            className="cursor-pointer"
+                            onClick={() => setFullscreenImage(image.url)}
+                          >
+                            <ImagePreview
+                              src={image.url}
+                              alt={`Generated image ${index + 1}`}
+                              prompt={image.prompt}
+                              onClose={() => setGeneratedImages(prev => 
+                                prev.filter(img => img.url !== image.url)
+                              )}
+                            />
+                          </div>
+                          <div className="px-4 pt-4">
+                            <button
+                              onClick={() => handleSaveImage(image.url)}
+                              className={`w-full ${
+                                image.saved 
+                                  ? 'bg-green-600 cursor-not-allowed' 
+                                  : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                              } text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]`}
+                              disabled={image.saved}
+                            >
+                              {image.saved ? 'Saved ✓' : 'Save & Continue →'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </motion.div>
               </CardContent>
             </Card>
           </motion.div>
         </div>
+
+        {/* Fullscreen Image Modal */}
+        {fullscreenImage && (
+          <motion.div 
+            className="fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setFullscreenImage(null)}
+          >
+            <div className="relative max-w-full max-h-full">
+              <img
+                src={fullscreenImage}
+                alt="Fullscreen preview"
+                className="max-w-full max-h-[90vh] rounded-lg"
+              />
+              <button
+                onClick={() => setFullscreenImage(null)}
+                className="absolute -top-10 right-0 text-white hover:text-gray-200 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Loading Overlay */}
         {isLoading && (

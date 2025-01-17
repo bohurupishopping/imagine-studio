@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { createServiceClient } from '@/utils/supabase/server';
+import { v4 as uuidv4 } from 'uuid';
 
 type ImageSize = '1024x1024' | '1024x1792' | '1792x1024';
 
@@ -97,10 +99,40 @@ export async function POST(request: Request) {
       throw new Error('No image generated');
     }
 
+    // Download the generated image
+    const imageResponse = await fetch(response.data[0].url);
+    const imageBlob = await imageResponse.blob();
+    const imageBuffer = Buffer.from(await imageBlob.arrayBuffer());
+
+    // Upload to Supabase Storage
+    const supabase = createServiceClient();
+    const filePath = `designs/${uuidv4()}.png`;
+    
+    const { error: uploadError } = await supabase.storage
+      .from('t-shirt-designs')
+      .upload(filePath, imageBuffer, {
+        contentType: 'image/png',
+        upsert: false
+      });
+
+    if (uploadError) {
+      throw new Error(`Storage upload failed: ${uploadError.message}`);
+    }
+
+    // Get public URL
+    const { data: urlData } = supabase.storage
+      .from('t-shirt-designs')
+      .getPublicUrl(filePath);
+
+    if (!urlData?.publicUrl) {
+      throw new Error('Failed to get public URL');
+    }
+
     return NextResponse.json({
       success: true,
       data: [{
-        url: response.data[0].url
+        url: urlData.publicUrl,
+        storagePath: filePath
       }]
     });
 
@@ -114,4 +146,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}

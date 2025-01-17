@@ -1,36 +1,41 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 
+// Client for authentication and session management
 export const createClient = async () => {
   const cookieStore = await cookies()
-
-  return createServerClient(
+  
+  return createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value, ...options })
-          } catch (error) {
-            // The `set` method isn't supported from the Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+      auth: {
+        storage: {
+          getItem: (key) => cookieStore.get(key)?.value ?? null,
+          setItem: (key, value) => {
+            try {
+              cookieStore.set({ name: key, value, path: '/' })
+            } catch (error) {
+              // Handle error silently
+            }
+          },
+          removeItem: (key) => {
+            try {
+              cookieStore.delete(key)
+            } catch (error) {
+              // Handle error silently
+            }
           }
-        },
-        remove(name: string, options: CookieOptions) {
-          try {
-            cookieStore.set({ name, value: '', ...options })
-          } catch (error) {
-            // The `delete` method isn't supported from the Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-      },
+        }
+      }
     }
+  )
+}
+
+// Service client for elevated permissions
+export const createServiceClient = () => {
+  return createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 }
