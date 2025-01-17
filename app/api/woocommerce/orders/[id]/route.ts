@@ -6,9 +6,9 @@ const CONSUMER_SECRET = process.env.WOO_CONSUMER_SECRET;
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = context.params;
 
   if (!CONSUMER_KEY || !CONSUMER_SECRET) {
     return NextResponse.json(
