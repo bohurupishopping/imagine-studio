@@ -1,7 +1,7 @@
 'use client';
 
 import { Sidebar } from '@/components/sidebar';
-import { MobileFooter } from '@/components/mobile-footer';
+import { MobileFooter } from '@/components/others/mobile-footer';
 
 export default function ImagineLayout({
   children,

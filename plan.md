@@ -15,7 +15,7 @@ Page Flow:
 5. User can:
    - View fullscreen preview
    - Delete unwanted images
-   - Save preferred image
+   - Save preferred image meta data to supabase tabel, and open the Text Customization Popup by clicking Save & Continue, 
 
 Backend Actions:
 - Image Generation:
@@ -60,24 +60,39 @@ Key Considerations:
 
 **Completed and Tested**
 
-2. Text Customization Page
-Objective: Let users add text (using local Bengali fonts and web fonts) to the selected image.
+2. Text Customization Popup
+When users click “Save & Continue” on the imagine page, open the Text Customization Widget as a modal popup:
 
-Page Flow:
+Page Flow (with Popup Widget)
 User Interface:
 
-Display the saved image as a background preview.
-Provide a text input box where users can:
-Enter text content.
-Choose font styles (dropdown for local Bengali fonts and web fonts).
-Pick text color.
-Preview Section:
+Popup Widget Interface
+Image Preview Section
+Image Display: Show the selected image in the preview section. Seperate, Just for Preview only
 
-Dynamically render the text over the image preview based on user input.
-Allow users to drag the text position or resize it (optional for advanced UX).
-Backend Actions:
+Text Preview Section:
+Live Text Preview: Dynamically render the text input on the preview. Users can see their updates (font, color, format, ) in real-time.
 
-On "Save & Continue," store text customization data (image ID, font, text, color, position, etc.) in a Supabase database table.
+Input Section
+Text Input Fields: Provide up to two input fields, labeled as “Text 1” and “Text 2.”
+
+Each input field has:
+A text input box for entering custom text.
+A font dropdown (preloaded with local Bengali fonts and web fonts).
+A color picker for text color.
+Resizing Option (Optional):
+Add slider inputs for scaling text size (for finer control).
+
+Buttons
+Add Another Text Field: Disabled if the second field is already in use.
+Reset Customization: Resets all inputs and clears text previews.
+
+Save & Continue:
+Validates user inputs (e.g., ensures at least one text field is filled).
+Saves customization data to Supabase design table (update the existing table, because already created during imagine page,).
+
+
+On "Save & Continue," store text customization data (image ID url, font, text, color, position, etc.) in a Supabase database table.
 State Management:
 
 Keep all customization details in local state or session until saved.
@@ -88,6 +103,8 @@ Key Considerations:
 Simplicity: Avoid image modifications; focus solely on text.
 Fonts: Preload local fonts for smooth rendering.
 Error Handling: Ensure fonts and colors are correctly mapped to the preview.
+
+
 3. Order Details Page
 Objective: Validate WooCommerce orders and store all design-related data for the order.
 

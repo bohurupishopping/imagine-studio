@@ -10,6 +10,7 @@ import { imagineService } from '@/services/imagineService';
 import { Wand2, Image as ImageIcon } from 'lucide-react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
+import { TextCustomizationPopup } from '@/components/imagine/TextCustomizationPopup';
 
 export default function GeneratePage() {
   const { toast } = useToast();
@@ -23,6 +24,12 @@ export default function GeneratePage() {
     saved?: boolean;
   }>>([]);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const [showTextPopup, setShowTextPopup] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<{
+    url: string;
+    prompt: string;
+    filePath: string;
+  } | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -120,8 +127,13 @@ export default function GeneratePage() {
         img.url === imageUrl ? { ...img, saved: true } : img
       ));
 
-      // Navigate to Text Customization Page
-      router.push(`/imagine/customize?image=${encodeURIComponent(filePath)}`);
+      // Set selected image data and show text customization popup
+      setSelectedImage({
+        url: publicUrl,
+        prompt: existingImage.prompt,
+        filePath
+      });
+      setShowTextPopup(true);
     } catch (error) {
       console.error('Error saving image:', error);
       toast({
@@ -228,15 +240,25 @@ export default function GeneratePage() {
                           </div>
                           <div className="px-4 pt-4">
                             <button
-                              onClick={() => handleSaveImage(image.url)}
-                              className={`w-full ${
+                              className={`w-full bg-gradient-to-r ${
                                 image.saved 
-                                  ? 'bg-green-600 cursor-not-allowed' 
-                                  : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                                  ? 'from-green-600 to-green-700 hover:from-green-700 hover:to-green-800' 
+                                  : 'from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
                               } text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]`}
-                              disabled={image.saved}
+                              onClick={() => {
+                                if (image.saved) {
+                                  setSelectedImage({
+                                    url: image.url,
+                                    prompt: image.prompt,
+                                    filePath: image.url.split('/storage/v1/object/public/t-shirt-designs/')[1]
+                                  });
+                                  setShowTextPopup(true);
+                                } else {
+                                  handleSaveImage(image.url);
+                                }
+                              }}
                             >
-                              {image.saved ? 'Saved ✓' : 'Save & Continue →'}
+                              {image.saved ? 'Edit Design ✏️' : 'Save & Continue →'}
                             </button>
                           </div>
                         </div>
@@ -277,8 +299,45 @@ export default function GeneratePage() {
           </motion.div>
         )}
 
-        {/* Loading Overlay */}
-        {isLoading && (
+      {/* Text Customization Popup */}
+      {showTextPopup && selectedImage && (
+        <TextCustomizationPopup
+          imageUrl={selectedImage.url}
+          prompt={selectedImage.prompt}
+          filePath={selectedImage.filePath}
+          onClose={() => setShowTextPopup(false)}
+          onSave={async (customizationData) => {
+            try {
+              const { data: { session } } = await supabase.auth.getSession();
+              if (!session) throw new Error('No active session');
+
+              // Save text customization to Supabase
+              const { error } = await supabase
+                .from('designs')
+                .update({ 
+                  text1: customizationData.text1,
+                  text2: customizationData.text2,
+                  font1: customizationData.font1,
+                  font2: customizationData.font2,
+                  color1: customizationData.color1,
+                  color2: customizationData.color2,
+                  size1: customizationData.size1,
+                  size2: customizationData.size2,
+                  updated_at: new Date().toISOString()
+                })
+                .eq('image_url', selectedImage.filePath);
+
+              if (error) throw error;
+            } catch (error) {
+              console.error('Error saving text customization:', error);
+              throw error;
+            }
+          }}
+        />
+      )}
+
+      {/* Loading Overlay */}
+      {isLoading && (
           <motion.div 
             className="fixed inset-0 bg-white/95 backdrop-blur-lg flex items-center justify-center z-50"
             initial={{ opacity: 0 }}

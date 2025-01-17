@@ -6,7 +6,15 @@ create table designs (
   public_url text not null,
   prompt text not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  text1 text,
+  text2 text,
+  font1 text,
+  font2 text,
+  color1 text,
+  color2 text,
+  size1 integer,
+  size2 integer
 );
 
 -- Enable Row Level Security
