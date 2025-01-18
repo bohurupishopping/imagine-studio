@@ -182,7 +182,7 @@ export default function OrderPage() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white via-purple-50 to-blue-50 p-4 md:pl-[78px] h-full">
+    <div className="bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 p-4 md:pl-[78px] min-h-screen backdrop-blur-sm">
       <motion.div
         className="max-w-6xl mx-auto"
         initial={{ opacity: 0, y: 20 }}
@@ -190,54 +190,55 @@ export default function OrderPage() {
         transition={{ duration: 0.3 }}
       >
         <motion.div
-          className="py-6 md:py-10"
+          className="py-8 md:py-12"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-800">
+          <h1 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">
             Order Creation
           </h1>
-          <p className="mt-2 text-center text-gray-600">
+          <p className="mt-3 text-center text-gray-600/90 text-sm md:text-base">
             Place your customization order from bohurupi.com
           </p>
           <motion.div
-            className="flex justify-center mt-4"
+            className="flex justify-center mt-6"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2 }}
           >
-            
           </motion.div>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Order Details Section */}
-          <Card className="p-6 border bg-white backdrop-blur-sm hover:shadow-lg transition-all duration-300 ease-in-out hover:border-purple-200">
-            <div className="flex gap-2 mb-3">
-              <Input
-                placeholder="Order ID"
-                value={orderId}
-                onChange={(e) => setOrderId(e.target.value)}
-                className="flex-1 h-8 text-xs"
-              />
-              <Button 
-                onClick={handleFetchOrder} 
-                className="h-8 text-xs"
-              >
-                Fetch Order
-              </Button>
+          <Card className="p-6 border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="Order ID"
+                  value={orderId}
+                  onChange={(e) => setOrderId(e.target.value)}
+                  className="flex-1 h-9 text-sm bg-white/80 border-gray-200/80 focus:border-purple-300 focus:ring-purple-200"
+                />
+                <Button
+                  onClick={handleFetchOrder}
+                  className="h-9 text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
+                >
+                  Fetch Order
+                </Button>
+              </div>
             </div>
 
             {orderError && (
-              <div className="mb-3 p-2 bg-red-50 border border-red-100 rounded text-red-600 text-xs">
+              <div className="mb-3 p-3 bg-red-50/80 backdrop-blur-sm border-l-4 border border-red-200 border-l-red-500 rounded-lg text-red-600 text-sm">
                 {orderError}
               </div>
             )}
 
             {orderDetails && (
               <div className="space-y-3">
-                <div className="overflow-x-auto">
-                  <Table className="min-w-full text-sm">
+                <div className="overflow-x-auto rounded-lg border border-gray-100/80 shadow-sm">
+                  <Table className="min-w-full text-sm bg-white/60 backdrop-blur-sm">
                     <TableBody>
                       {[
                         { label: 'Order Number', value: orderDetails.number },
@@ -257,9 +258,15 @@ export default function OrderPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {/* Billing Address - Compact Mobile Version */}
-                  <Card className="p-2 md:p-4 border bg-white backdrop-blur-sm hover:shadow-lg transition-all duration-300 ease-in-out hover:border-purple-200">
-                    <h4 className="font-semibold mb-1 text-xs md:text-sm text-purple-600">Billing</h4>
-                    <div className="text-xs md:text-sm text-gray-700 space-y-1">
+                  <Card className="p-3 md:p-4 border border-white/40 bg-white/90 backdrop-blur-md rounded-lg shadow-md hover:shadow-lg transition-all duration-300 ease-in-out hover:border-purple-200">
+                    <h4 className="font-semibold mb-2 text-xs md:text-sm bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent flex items-center gap-2">
+                      <svg className="w-3.5 h-3.5 md:w-4 md:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path className="text-purple-600" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle className="text-purple-600" cx="12" cy="10" r="3"/>
+                      </svg>
+                      Billing
+                    </h4>
+                    <div className="text-xs md:text-sm text-gray-700/90 space-y-2">
                       <div className="truncate">{orderDetails.billing.first_name} {orderDetails.billing.last_name}</div>
                       <div className="hidden md:block">{orderDetails.billing.address_1}</div>
                       {orderDetails.billing.address_2 && (
@@ -336,15 +343,20 @@ export default function OrderPage() {
               </Button>
             </Card>
           ) : (
-            <Card className="p-6 border bg-white backdrop-blur-sm hover:shadow-lg transition-all duration-300 ease-in-out hover:border-purple-200">
-              <h2 className="text-sm font-semibold mb-4 text-purple-600">Your Designs</h2>
-              <div className="overflow-x-auto rounded-lg border border-gray-100 shadow-sm">
-                <Table className="min-w-full text-sm">
-                  <TableHeader className="bg-gray-50">
+            <Card className="p-6 border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+              <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-600" />
+                <span className="bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  Your Designs
+                </span>
+              </h2>
+              <div className="overflow-x-auto rounded-lg border border-gray-100/80 shadow-sm">
+                <Table className="min-w-full text-sm bg-white/60 backdrop-blur-sm">
+                  <TableHeader className="bg-gray-50/80">
                     <TableRow>
-                      <TableHead className="p-2 font-medium text-gray-600">Image</TableHead>
-                      <TableHead className="p-2 font-medium text-gray-600">Customizations</TableHead>
-                      <TableHead className="p-2 w-32 font-medium text-gray-600">Actions</TableHead>
+                      <TableHead className="p-3 font-medium text-gray-700">Image</TableHead>
+                      <TableHead className="p-3 font-medium text-gray-700">Customizations</TableHead>
+                      <TableHead className="p-3 w-32 font-medium text-gray-700">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -366,20 +378,34 @@ export default function OrderPage() {
                         <TableCell className="p-2">
                           <div className="space-y-2">
                             {design.text1 && (
-                              <div className="flex flex-col space-y-1 p-2 bg-gray-50 rounded">
-                                <span className="text-xs font-medium text-gray-600">Text 1</span>
-                                <span className="text-sm">{design.text1}</span>
-                                <div className="text-xs text-gray-500">
-                                  Font: {design.font1} | Color: {design.color1} | Size: {design.size1}
+                              <div className="flex flex-col space-y-1.5 p-3 bg-gray-50/80 backdrop-blur-sm rounded-lg border border-gray-100/60 shadow-sm">
+                                <span className="text-xs font-medium bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                                  Text 1
+                                </span>
+                                <span className="text-sm text-gray-700">{design.text1}</span>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                  <span>Font: <span className="text-gray-700">{design.font1}</span></span>
+                                  <span className="flex items-center gap-1">
+                                    Color:
+                                    <div className="w-3 h-3 rounded-full border shadow-sm" style={{ backgroundColor: design.color1 }} />
+                                  </span>
+                                  <span>Size: <span className="text-gray-700">{design.size1}</span></span>
                                 </div>
                               </div>
                             )}
                             {design.text2 && (
-                              <div className="flex flex-col space-y-1 p-2 bg-gray-50 rounded">
-                                <span className="text-xs font-medium text-gray-600">Text 2</span>
-                                <span className="text-sm">{design.text2}</span>
-                                <div className="text-xs text-gray-500">
-                                  Font: {design.font2} | Color: {design.color2} | Size: {design.size2}
+                              <div className="flex flex-col space-y-1.5 p-3 bg-gray-50/80 backdrop-blur-sm rounded-lg border border-gray-100/60 shadow-sm">
+                                <span className="text-xs font-medium bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                                  Text 2
+                                </span>
+                                <span className="text-sm text-gray-700">{design.text2}</span>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                  <span>Font: <span className="text-gray-700">{design.font2}</span></span>
+                                  <span className="flex items-center gap-1">
+                                    Color:
+                                    <div className="w-3 h-3 rounded-full border shadow-sm" style={{ backgroundColor: design.color2 }} />
+                                  </span>
+                                  <span>Size: <span className="text-gray-700">{design.size2}</span></span>
                                 </div>
                               </div>
                             )}
