@@ -102,6 +102,12 @@ export default function OrderPage() {
       return;
     }
 
+    // Validate order status
+    if (!['completed', 'processing'].includes(orderDetails.status)) {
+      setOrderError("Only paid orders can be processed");
+      return;
+    }
+
     if (!designs.length) {
       setOrderError("No designs found to associate with order");
       return;
@@ -113,26 +119,50 @@ export default function OrderPage() {
         throw new Error("User not authenticated");
       }
 
-      // Combine order and design data
+      // Structure woocommerce_order data
+      const woocommerceOrder = {
+        id: orderDetails.id,
+        parent_id: orderDetails.parent_id,
+        number: orderDetails.number,
+        status: orderDetails.status,
+        date_created: orderDetails.date_created,
+        total: orderDetails.total,
+        billing: {
+          first_name: orderDetails.billing.first_name,
+          last_name: orderDetails.billing.last_name,
+          email: orderDetails.billing.email,
+          phone: orderDetails.billing.phone
+        },
+        line_items: orderDetails.line_items.map(item => ({
+          id: item.id,
+          name: item.name,
+          product_id: item.product_id,
+          variation_id: item.variation_id,
+          quantity: item.quantity
+        }))
+      };
+
+      // Get text customization from first design
+      const design = designs[0];
+      const textCustomization = {
+        text1: design.text1,
+        text2: design.text2,
+        font1: design.font1,
+        font2: design.font2,
+        color1: design.color1,
+        color2: design.color2,
+        size1: design.size1,
+        size2: design.size2
+      };
+
+      // Prepare order data
       const orderData = {
-        order_id: orderDetails.id,
         user_id: user.id,
-        order_data: orderDetails,
-        designs: designs.map(design => ({
-          id: design.id,
-          public_url: design.public_url,
-          customizations: {
-            text1: design.text1,
-            text2: design.text2,
-            font1: design.font1,
-            font2: design.font2,
-            color1: design.color1,
-            color2: design.color2,
-            size1: design.size1,
-            size2: design.size2
-          }
-        })),
-        created_at: new Date().toISOString()
+        design_id: design.id,
+        image_url: design.public_url,
+        text_customization: textCustomization,
+        woocommerce_order: woocommerceOrder,
+        status: 'pending'
       };
 
       // Save to orders table
@@ -356,16 +386,124 @@ export default function OrderPage() {
                               variant="outline"
                               size="sm"
                               className="h-6 text-xs"
-                              onClick={() => {
-                                // Print functionality will be implemented later
-                                toast({
-                                  title: "Order",
-                                  description: "Order functionality coming soon",
-                                  variant: "default",
-                                });
+                              disabled={!orderDetails || !designs.length}
+                              onClick={async () => {
+                                try {
+                                  console.log('Starting order placement...');
+                                  
+                                  // Get authenticated user
+                                  const { data: { user }, error: authError } = await supabase.auth.getUser();
+                                  if (authError || !user) {
+                                    console.error('Authentication error:', authError);
+                                    throw new Error('User not authenticated');
+                                  }
+                                  console.log('Authenticated user:', user.id);
+
+                                  // Validate selected design
+                                  if (!designs.length) {
+                                    console.error('No designs available');
+                                    throw new Error('No designs available');
+                                  }
+                                  const design = designs[0];
+                                  console.log('Selected design:', design.id);
+
+                                  // Validate WooCommerce order
+                                  if (!orderDetails) {
+                                    console.error('No order details available');
+                                    throw new Error('No order details available');
+                                  }
+                                  console.log('Order details:', orderDetails.id);
+
+                                  // Validate order status (completed, processing, and delivered are valid paid statuses)
+                                  const validStatuses = ['completed', 'processing', 'delivered'];
+                                  if (!validStatuses.includes(orderDetails.status)) {
+                                    console.error('Invalid order status:', orderDetails.status);
+                                    throw new Error(`Only paid orders can be processed. Current status: ${orderDetails.status}`);
+                                  }
+                                  console.log('Order status valid:', orderDetails.status);
+
+                                  // Get first line item (assuming single product orders)
+                                  const lineItem = orderDetails.line_items[0];
+                                  if (!lineItem) {
+                                    console.error('No line items found in order');
+                                    throw new Error('No line items found in order');
+                                  }
+                                  console.log('Line item:', lineItem.id);
+
+                                  // Create order data with separate line item columns
+                                  const orderData = {
+                                    user_id: user.id,
+                                    design_id: design.id,
+                                    public_url: design.public_url,
+                                    text1: design.text1 || '',
+                                    text2: design.text2 || null,
+                                    font1: design.font1 || '',
+                                    font2: design.font2 || null,
+                                    color1: design.color1 || '',
+                                    color2: design.color2 || null,
+                                    size1: design.size1 || 0,
+                                    size2: design.size2 || null,
+                                    // WooCommerce order fields
+                                    woocommerce_id: orderDetails.id,
+                                    woocommerce_parent_id: orderDetails.parent_id,
+                                    woocommerce_number: orderDetails.number,
+                                    woocommerce_status: orderDetails.status,
+                                    woocommerce_date_created: orderDetails.date_created,
+                                    woocommerce_total: orderDetails.total,
+                                    // Billing info
+                                    billing_first_name: orderDetails.billing.first_name,
+                                    billing_last_name: orderDetails.billing.last_name,
+                                    billing_email: orderDetails.billing.email,
+                                    billing_phone: orderDetails.billing.phone,
+                                    // Line item fields
+                                    line_item_id: lineItem.id,
+                                    line_item_name: lineItem.name,
+                                    line_item_product_id: lineItem.product_id,
+                                    line_item_variation_id: lineItem.variation_id,
+                                    line_item_quantity: lineItem.quantity,
+                                    line_item_price: lineItem.price,
+                                    line_item_subtotal: lineItem.subtotal,
+                                    line_item_total: lineItem.total,
+                                    line_item_sku: lineItem.sku,
+                                    line_item_meta_data: lineItem.meta_data,
+                                    status: 'pending'
+                                  };
+
+                                  console.log('Order data to insert:', JSON.stringify(orderData, null, 2));
+                                  
+                                  // Insert order
+                                  console.log('Attempting to insert order...');
+                                  const { data, error } = await supabase
+                                    .from('orders')
+                                    .insert(orderData)
+                                    .select();
+
+                                  console.log('Insert result:', { data, error });
+
+                                  if (error) {
+                                    console.error('Order insertion failed:', error);
+                                    throw error;
+                                  }
+
+                                  if (!data) {
+                                    console.error('No data returned from order insertion');
+                                    throw new Error('No data returned from order insertion');
+                                  }
+
+                                  console.log('Order successfully created:', data);
+                                  // Redirect to confirmation
+                                  console.log('Redirecting to confirmation page...');
+                                  window.location.href = '/order/confirmation';
+                                } catch (error) {
+                                  toast({
+                                    title: 'Order Failed',
+                                    description: error instanceof Error ? error.message : 'Failed to place order',
+                                    variant: 'destructive'
+                                  });
+                                }
                               }}
                             >
-                              Order
+                              Place Order
                             </Button>
                             <Button
                               variant="destructive"
