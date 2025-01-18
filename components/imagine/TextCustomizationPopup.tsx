@@ -9,9 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
-import { X, Sparkles, Palette, TextCursor, Type, Image as ImageIcon } from 'lucide-react';
-import { HexColorPicker } from 'react-colorful';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { X, Sparkles, TextCursor, Type, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface TextCustomizationPopupProps {
@@ -42,6 +40,17 @@ const SIZE_OPTIONS = [
   { value: 40, label: 'Medium' },
   { value: 60, label: 'Large' },
   { value: 80, label: 'X-Large' }
+];
+
+const COLOR_OPTIONS = [
+  { value: '#000000', label: 'Black' },
+  { value: '#FFFFFF', label: 'White' },
+  { value: '#FF0000', label: 'Red' },
+  { value: '#0000FF', label: 'Blue' },
+  { value: '#FFD700', label: 'Gold' },
+  { value: '#4CAF50', label: 'Green' },
+  { value: '#9C27B0', label: 'Purple' },
+  { value: '#FF9800', label: 'Orange' }
 ];
 
 export function TextCustomizationPopup({
@@ -128,37 +137,39 @@ export function TextCustomizationPopup({
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="bg-white rounded-xl w-full max-w-3xl overflow-hidden shadow-lg border flex flex-col h-[90vh] sm:h-auto"
+          className="bg-white/90 backdrop-blur-md rounded-xl w-full max-w-3xl overflow-hidden shadow-2xl border border-white/40 flex flex-col h-[90vh] sm:h-auto"
           initial={{ scale: 0.95, y: 20 }}
           animate={{ scale: 1, y: 0 }}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-purple-50 to-blue-50">
+          <div className="flex items-center justify-between px-4 py-3 sm:p-4 border-b bg-gradient-to-r from-purple-50/80 to-blue-50/80 backdrop-blur-sm">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-purple-600" />
-              <h2 className="text-xl font-semibold">Customize Your Design</h2>
+              <h2 className="text-lg sm:text-xl font-semibold bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Customize Your Design
+              </h2>
             </div>
             <button
               onClick={onClose}
-              className="p-1 rounded-md hover:bg-gray-100 transition-colors"
+              className="p-1.5 rounded-md hover:bg-white/50 transition-colors"
               aria-label="Close"
             >
-              <X className="w-5 h-5 text-gray-600" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 overflow-auto p-4 grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-4">
+          <div className="flex-1 overflow-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-3 sm:gap-4">
             {/* Preview Section */}
             <div className="space-y-4">
-              <div className="bg-white rounded-lg shadow-sm border p-4">
-                <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                  <TextCursor className="w-4 h-4" />
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg border border-white/60 p-3 sm:p-4">
+                <h3 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center gap-2 text-gray-700">
+                  <TextCursor className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Text Preview
                 </h3>
-                <div className="space-y-3">
-                  <div 
-                    className="p-3 bg-gray-50 rounded-lg border shadow-inner min-h-[60px] flex items-center"
+                <div className="space-y-2 sm:space-y-3">
+                  <div
+                    className="p-2 sm:p-3 bg-gray-50/80 rounded-lg border shadow-inner min-h-[50px] sm:min-h-[60px] flex items-center justify-center text-center"
                     style={previewStyles1}
                   >
                     {text1 || 'Text 1 Preview'}
@@ -166,7 +177,7 @@ export function TextCustomizationPopup({
                   <AnimatePresence>
                     {showText2 && (
                       <motion.div
-                        className="p-3 bg-gray-50 rounded-lg border shadow-inner min-h-[60px] flex items-center"
+                        className="p-2 sm:p-3 bg-gray-50/80 rounded-lg border shadow-inner min-h-[50px] sm:min-h-[60px] flex items-center justify-center text-center"
                         style={previewStyles2}
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
@@ -179,12 +190,12 @@ export function TextCustomizationPopup({
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-sm border p-4">
-                <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4" />
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg border border-white/60 p-3 sm:p-4">
+                <h3 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center gap-2 text-gray-700">
+                  <ImageIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Image Preview
                 </h3>
-                <div className="w-full aspect-square bg-gray-50 rounded-lg overflow-hidden border shadow-inner max-sm:w-42 max-sm:h-32">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-50/80 rounded-lg overflow-hidden border shadow-inner mx-auto">
                   <img
                     src={imageUrl}
                     alt="Customization preview"
@@ -198,18 +209,18 @@ export function TextCustomizationPopup({
             {/* Customization Controls */}
             <div className="space-y-4">
               {/* Text 1 Section */}
-              <div className="space-y-2">
-                <Label className="text-sm flex items-center gap-2">
-                  <Type className="w-4 h-4" />
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label className="text-xs sm:text-sm flex items-center gap-1.5 text-gray-700">
+                  <Type className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   Text 1
                 </Label>
                 <Input
                   value={text1}
                   onChange={(e) => setText1(e.target.value)}
                   placeholder="Enter first text..."
-                  className="text-sm"
+                  className="text-xs sm:text-sm h-8 sm:h-9"
                 />
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-1 sm:gap-2">
                   <div className="space-y-1">
                     <Label className="text-xs">Font</Label>
                     <Select value={font1} onValueChange={setFont1}>
@@ -231,28 +242,38 @@ export function TextCustomizationPopup({
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">Color</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-8 w-full justify-start text-xs"
-                        >
-                          <div 
-                            className="h-4 w-4 rounded-full mr-2 border"
-                            style={{ backgroundColor: color1 }}
-                          />
-                          <span>Pick color</span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-fit p-2">
-                        <HexColorPicker
-                          color={color1}
-                          onChange={setColor1}
-                          className="w-40 h-40"
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <Select value={color1} onValueChange={setColor1}>
+                      <SelectTrigger className="h-8 text-xs">
+                        <SelectValue>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="h-3 w-3 rounded-full border"
+                              style={{ backgroundColor: color1 }}
+                            />
+                            <span>
+                              {COLOR_OPTIONS.find(c => c.value === color1)?.label || 'Select color'}
+                            </span>
+                          </div>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COLOR_OPTIONS.map(option => (
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            className="text-xs"
+                          >
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="h-3 w-3 rounded-full border"
+                                style={{ backgroundColor: option.value }}
+                              />
+                              {option.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">Size</Label>
@@ -283,22 +304,22 @@ export function TextCustomizationPopup({
               <AnimatePresence>
                 {showText2 && (
                   <motion.div
-                    className="space-y-2"
+                    className="space-y-1.5 sm:space-y-2"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                   >
-                    <Label className="text-sm flex items-center gap-2">
-                      <Type className="w-4 h-4" />
+                    <Label className="text-xs sm:text-sm flex items-center gap-1.5 text-gray-700">
+                      <Type className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       Text 2
                     </Label>
                     <Input
                       value={text2}
                       onChange={(e) => setText2(e.target.value)}
                       placeholder="Enter second text..."
-                      className="text-sm"
+                      className="text-xs sm:text-sm h-8 sm:h-9"
                     />
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-3 gap-1 sm:gap-2">
                       <div className="space-y-1">
                         <Label className="text-xs">Font</Label>
                         <Select value={font2} onValueChange={setFont2}>
@@ -320,28 +341,38 @@ export function TextCustomizationPopup({
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Color</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 w-full justify-start text-xs"
-                            >
-                              <div 
-                                className="h-4 w-4 rounded-full mr-2 border"
-                                style={{ backgroundColor: color2 }}
-                              />
-                              <span>Pick color</span>
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-fit p-2">
-                            <HexColorPicker
-                              color={color2}
-                              onChange={setColor2}
-                              className="w-40 h-40"
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <Select value={color2} onValueChange={setColor2}>
+                          <SelectTrigger className="h-8 text-xs">
+                            <SelectValue>
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className="h-3 w-3 rounded-full border"
+                                  style={{ backgroundColor: color2 }}
+                                />
+                                <span>
+                                  {COLOR_OPTIONS.find(c => c.value === color2)?.label || 'Select color'}
+                                </span>
+                              </div>
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {COLOR_OPTIONS.map(option => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                                className="text-xs"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div
+                                    className="h-3 w-3 rounded-full border"
+                                    style={{ backgroundColor: option.value }}
+                                  />
+                                  {option.label}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Size</Label>
