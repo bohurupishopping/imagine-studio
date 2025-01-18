@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Brush, PenTool, Type, Palette, Pencil, Sparkles } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -14,27 +14,33 @@ import {
 export const imageStyles = {
   'minimalist': {
     name: 'Minimalist',
-    prompt: 'minimalist design, clean lines, simple shapes, monochromatic color scheme, negative space, modern aesthetic, geometric patterns, flat design, vector art, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing'
+    prompt: 'minimalist design, clean lines, simple shapes, monochromatic color scheme, negative space, modern aesthetic, geometric patterns, flat design, vector art, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    icon: <Brush className="w-3.5 h-3.5 mr-2" />
   },
   'vintage': {
     name: 'Vintage',
-    prompt: 'vintage t-shirt design, retro style, distressed textures, faded colors, classic typography, old school aesthetic, weathered look, hand-drawn elements, screen print effect, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing'
+    prompt: 'vintage t-shirt design, retro style, distressed textures, faded colors, classic typography, old school aesthetic, weathered look, hand-drawn elements, screen print effect, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    icon: <Sparkles className="w-3.5 h-3.5 mr-2" />
   },
   'typography': {
     name: 'Typography',
-    prompt: 'typographic design, bold fonts, creative text arrangement, modern typography, clean layout, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing'
+    prompt: 'typographic design, bold fonts, creative text arrangement, modern typography, clean layout, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    icon: <Type className="w-3.5 h-3.5 mr-2" />
   },
   'illustrative': {
     name: 'Illustrative',
-    prompt: 'illustrative design, hand-drawn elements, detailed line work, creative composition, artistic style, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing'
+    prompt: 'illustrative design, hand-drawn elements, detailed line work, creative composition, artistic style, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    icon: <PenTool className="w-3.5 h-3.5 mr-2" />
   },
   'graphic': {
     name: 'Graphic',
-    prompt: 'graphic design, bold colors, geometric shapes, modern patterns, abstract composition, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing'
+    prompt: 'graphic design, bold colors, geometric shapes, modern patterns, abstract composition, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    icon: <Palette className="w-3.5 h-3.5 mr-2" />
   },
   'hand-drawn': {
     name: 'Hand Drawn',
-    prompt: 'hand-drawn design, sketch style, organic shapes, artistic imperfections, creative illustration, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing'
+    prompt: 'hand-drawn design, sketch style, organic shapes, artistic imperfections, creative illustration, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    icon: <Pencil className="w-3.5 h-3.5 mr-2" />
   }
 };
 
@@ -57,14 +63,13 @@ export default function ImageStyleSelector({ onStyleChange }: ImageStyleSelector
           variant="ghost"
           size="sm"
           className={cn(
-            "h-8 w-[120px] px-2",
-            "flex items-center justify-between gap-1.5",
-            "rounded-full",
-            "bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900",
-            "border border-gray-200/80 dark:border-gray-700/80",
+            "h-8 w-[110px] px-2",
+            "flex items-center justify-between gap-1",
+            "rounded-lg",
+            "bg-white/50 dark:bg-gray-800/50",
+            "border border-white/30 dark:border-gray-700/50",
             "hover:border-blue-300/50 dark:hover:border-blue-700/50",
-            "hover:shadow-[0_2px_8px_rgba(59,130,246,0.15)]",
-            "dark:hover:shadow-[0_2px_8px_rgba(59,130,246,0.1)]",
+            "hover:shadow-sm",
             "group transition-all duration-200"
           )}
         >
@@ -76,21 +81,21 @@ export default function ImageStyleSelector({ onStyleChange }: ImageStyleSelector
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        className={cn(
-          "w-[180px] p-1.5",
-          "bg-white/95 dark:bg-gray-800/95",
-          "border border-gray-200/50 dark:border-gray-700/50",
-          "backdrop-blur-md",
-          "animate-in zoom-in-90 duration-100"
-        )}
+          className={cn(
+            "w-[160px] p-1",
+            "bg-white/95 dark:bg-gray-800/95",
+            "border border-white/30 dark:border-gray-700/50",
+            "backdrop-blur-md",
+            "animate-in zoom-in-90 duration-100"
+          )}
       >
         {Object.entries(imageStyles).map(([id, style]) => (
           <DropdownMenuItem
             key={id}
             onClick={() => handleStyleSelect(id)}
             className={cn(
-              "text-sm flex items-center justify-between",
-              "px-3 py-2 rounded-md",
+              "text-xs flex items-center",
+              "px-2 py-1.5 rounded-md",
               "text-gray-700 dark:text-gray-300",
               "relative",
               selectedStyle === id && [
@@ -104,9 +109,10 @@ export default function ImageStyleSelector({ onStyleChange }: ImageStyleSelector
               "cursor-default select-none"
             )}
           >
-            <span>{style.name}</span>
+            {style.icon}
+            <span className="flex-1">{style.name}</span>
             {selectedStyle === id && (
-              <Check className="h-3.5 w-3.5" />
+              <Check className="h-3 w-3 ml-2" />
             )}
           </DropdownMenuItem>
         ))}

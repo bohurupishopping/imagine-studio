@@ -22,19 +22,20 @@ const MobileNavItem = memo(({ href, icon: Icon, label, isActive }: MobileNavItem
   <Link
     href={href}
     className={cn(
-      'flex flex-col items-center justify-center p-2 rounded-lg',
-      'transition-all duration-150',
+      'flex flex-col items-center justify-center p-2 rounded-2xl',
+      'transition-all duration-200 ease-in-out',
       'text-muted-foreground hover:text-primary hover:bg-background/30',
-      isActive && 'bg-violet-500/10 text-violet-700 dark:text-violet-300'
+      'active:scale-95 active:bg-background/50',
+      isActive && 'bg-violet-500/10 text-violet-700 dark:text-violet-300 shadow-sm'
     )}
     aria-current={isActive ? 'page' : undefined}
     tabIndex={0}
     aria-label={label}
   >
     <div className={cn(
-      'rounded-lg p-1.5 transition-colors',
+      'rounded-xl p-2 transition-colors',
       isActive
-        ? 'bg-violet-500/80 text-white'
+        ? 'bg-violet-500/80 text-white shadow-sm'
         : 'text-muted-foreground bg-background/50'
     )}>
       <Icon className="h-4 w-4" />
@@ -48,23 +49,28 @@ MobileNavItem.displayName = 'MobileNavItem';
 const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/imagine', icon: Image, label: 'Generate' },
-  { href: '/dashboard/history', icon: History, label: 'History' },
+  { href: '/order', icon: History, label: 'Order' },
   { href: '/dashboard/settings', icon: Settings, label: 'Settings' },
 ];
 
-export function MobileFooter() {
+interface MobileFooterProps {
+  className?: string;
+}
+
+export function MobileFooter({ className }: MobileFooterProps) {
   const pathname = usePathname();
 
   return (
     <nav 
       className={cn(
         'fixed bottom-0 left-0 right-0 md:hidden',
-        'bg-background/90 backdrop-blur-md',
-        'border-t border-border/50 shadow-sm'
+        'bg-background/95 backdrop-blur-lg',
+        'border-t border-border/50 shadow-lg',
+        className
       )}
       aria-label="Mobile navigation"
     >
-      <div className="grid grid-cols-4 gap-0.5 p-1.5">
+      <div className="grid grid-cols-4 gap-1 p-2">
         {NAV_ITEMS.map((item) => (
           <MobileNavItem
             key={item.href}

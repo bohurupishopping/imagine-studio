@@ -1,6 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { handleError, handleSupabaseError } from '@/utils/errorHandler';
+import { useLoading } from '@/hooks/useLoading';
+
+interface GeneratedImage {
+  url: string;
+  prompt: string;
+  timestamp: number;
+  saved?: boolean;
+}
+
+interface SelectedImage {
+  url: string;
+  prompt: string;
+  filePath: string;
+}
+
+interface ImageGenerationResponse {
+  success: boolean;
+  data: Array<{
+    url: string;
+  }>;
+  error?: string;
+}
 import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -16,20 +39,11 @@ export default function GeneratePage() {
   const { toast } = useToast();
   const router = useRouter();
   const supabase = createClientComponentClient();
-  const [isLoading, setIsLoading] = useState(false);
-  const [generatedImages, setGeneratedImages] = useState<Array<{
-    url: string;
-    prompt: string;
-    timestamp: number;
-    saved?: boolean;
-  }>>([]);
+  const { isLoading, withLoading } = useLoading();
+  const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [showTextPopup, setShowTextPopup] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<{
-    url: string;
-    prompt: string;
-    filePath: string;
-  } | null>(null);
+  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -51,9 +65,8 @@ export default function GeneratePage() {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const response = await imagineService.generateImage({
+    await withLoading(async () => {
+      const response: ImageGenerationResponse = await imagineService.generateImage({
         prompt,
         size: '1024x1024',
       });
@@ -72,21 +85,11 @@ export default function GeneratePage() {
       } else {
         throw new Error(response.error || 'Failed to generate image');
       }
-    } catch (error) {
-      console.error('Error generating image:', error);
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to generate image',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    }, (error) => handleError(error, toast));
   };
 
   const handleSaveImage = async (imageUrl: string) => {
-    setIsLoading(true);
-    try {
+    await withLoading(async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('No active session');
@@ -128,130 +131,116 @@ export default function GeneratePage() {
         filePath
       });
       setShowTextPopup(true);
-    } catch (error) {
-      console.error('Error saving image:', error);
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to save image',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    }, (error) => handleSupabaseError(error, toast));
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative bg-gradient-to-b from-white via-purple-50/30 to-blue-50/30">
-      <div className="max-w-7xl mx-auto flex flex-col min-h-[calc(100dvh-4rem)] relative z-10">
+    <div className="min-h-[calc(100vh-4rem)] relative bg-gradient-to-br from-gray-100 via-purple-50 to-blue-100">
+      <div className="max-w-7xl mx-auto flex flex-col min-h-[calc(100dvh-4rem)] relative z-10 px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <motion.div
+          className="py-6 md:py-10"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-800">
+            AI Image Generator
+          </h1>
+          <p className="mt-2 text-center text-gray-600">
+            Create stunning images with the power of AI
+          </p>
+        </motion.div>
+
+        {/* Input Section */}
+        <motion.div
+          className="mb-6 md:mb-8 w-full md:max-w-2xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Card className="border-none shadow-xl rounded-2xl bg-white/90 backdrop-blur-md">
+            <CardContent className="p-4">
+              <ImageInputSection
+                onGenerate={handleGenerate}
+                isLoading={isLoading}
+              />
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* Main Preview Area */}
-        <div className="flex-1 p-2 sm:p-4 overflow-auto">
+        <div className="flex-1 overflow-auto mb-6 md:mb-8">
           <motion.div
-            className="w-full max-w-6xl mx-auto"
+            className="w-full"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.3 }}
           >
             {generatedImages.length > 0 ? (
-              <Card className="border-none bg-white/80 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all duration-300 rounded-2xl overflow-hidden">
-                <CardHeader className="border-b border-gray-100 bg-gradient-to-r from-purple-50 to-blue-50 p-4">
-                  <CardTitle className="text-lg font-medium text-gray-700 flex items-center gap-2">
-                    <Wand2 className="w-5 h-5 text-purple-500" />
-                    Generated Designs
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6 bg-white/40">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                    {generatedImages.map((image, index) => (
-                      <motion.div
-                        key={index}
-                        className="relative group rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-[1.02] bg-white/50 backdrop-blur-sm border border-white/40"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4 pb-24">
+                {generatedImages.map((image, index) => (
+                  <motion.div
+                    key={index}
+                    className="relative group rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl bg-white/80 backdrop-blur-md border border-white/40 aspect-square"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <div 
+                      className="cursor-pointer"
+                      onClick={() => setFullscreenImage(image.url)}
+                    >
+                      <ImagePreview
+                        src={image.url}
+                        alt={`Generated image ${index + 1}`}
+                        prompt={image.prompt}
+                        onClose={() => setGeneratedImages(prev => 
+                          prev.filter(img => img.url !== image.url)
+                        )}
+                      />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent rounded-b-xl">
+                      <button
+                        className={`w-full text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 shadow-md ${
+                          image.saved 
+                            ? 'bg-green-600 hover:bg-green-700' 
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        }`}
+                        onClick={() => {
+                          if (image.saved) {
+                            setSelectedImage({
+                              url: image.url,
+                              prompt: image.prompt,
+                              filePath: image.url.split('/storage/v1/object/public/t-shirt-designs/')[1]
+                            });
+                            setShowTextPopup(true);
+                          } else {
+                            handleSaveImage(image.url);
+                          }
+                        }}
                       >
-                        <div className="border-b border-gray-100/50 pb-4">
-                          <div 
-                            className="cursor-pointer"
-                            onClick={() => setFullscreenImage(image.url)}
-                          >
-                            <ImagePreview
-                              src={image.url}
-                              alt={`Generated image ${index + 1}`}
-                              prompt={image.prompt}
-                              onClose={() => setGeneratedImages(prev => 
-                                prev.filter(img => img.url !== image.url)
-                              )}
-                            />
-                          </div>
-                          <div className="px-4 pt-4">
-                            <button
-                              className={`w-full bg-gradient-to-r ${
-                                image.saved 
-                                  ? 'from-green-600 to-green-700 hover:from-green-700 hover:to-green-800' 
-                                  : 'from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
-                              } text-white px-4 sm:px-6 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-[1.02]`}
-                              onClick={() => {
-                                if (image.saved) {
-                                  setSelectedImage({
-                                    url: image.url,
-                                    prompt: image.prompt,
-                                    filePath: image.url.split('/storage/v1/object/public/t-shirt-designs/')[1]
-                                  });
-                                  setShowTextPopup(true);
-                                } else {
-                                  handleSaveImage(image.url);
-                                }
-                              }}
-                            >
-                              {image.saved ? 'Edit Design ✏️' : 'Save & Continue →'}
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                        {image.saved ? 'Edit Design ✏️' : 'Save & Continue →'}
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             ) : (
-              <div className="flex items-center justify-center h-[50vh]">
+              <div className="flex items-center justify-center h-[40vh] bg-white/50 backdrop-blur-sm rounded-xl p-6">
                 <motion.div 
                   className="text-center text-gray-500"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <ImageIcon className="w-16 h-16 mx-auto mb-4 text-gray-400/50" />
-                  <p className="text-lg font-medium">No images generated yet</p>
-                  <p className="text-sm">Use the input below to create your first image</p>
+                  <ImageIcon className="w-12 h-12 mx-auto mb-3 text-gray-400/50" />
+                  <p className="text-base font-medium">
+                    Start creating! Enter a prompt above.
+                  </p>
                 </motion.div>
               </div>
             )}
           </motion.div>
         </div>
-
-        {/* Input Section */}
-        <motion.div
-          className="w-full backdrop-blur-xl border-t border-gray-100 py-2 md:py-6 px-2 md:px-4 bg-gradient-to-b from-white/80 via-white to-white"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div className="w-full px-2 md:max-w-4xl mx-auto mt-4 md:mt-8">
-            <Card className="w-full border border-gray-100 shadow-lg rounded-xl md:rounded-2xl overflow-hidden">
-              <CardHeader className="p-4 border-b border-gray-50 bg-gradient-to-r from-purple-50 to-blue-50">
-                <CardTitle className="text-lg font-medium text-gray-700 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-purple-500" />
-                  Create New Design
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 bg-white">
-                <ImageInputSection
-                  onGenerate={handleGenerate}
-                  isLoading={isLoading}
-                />
-              </CardContent>
-            </Card>
-          </div>
-        </motion.div>
 
         {/* Fullscreen Image Modal */}
         {fullscreenImage && (
@@ -326,7 +315,7 @@ export default function GeneratePage() {
                 // Navigate to order page after successful save
                 router.push('/order');
               } catch (error) {
-                console.error('Error saving text customization:', error);
+                handleSupabaseError(error, toast);
                 throw error;
               }
             }}

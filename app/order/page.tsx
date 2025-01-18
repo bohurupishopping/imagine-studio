@@ -182,28 +182,33 @@ export default function OrderPage() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white via-purple-50 to-blue-50 p-4 md:pl-[78px] min-h-screen">
+    <div className="bg-gradient-to-br from-white via-purple-50 to-blue-50 p-4 md:pl-[78px] h-full">
       <motion.div
         className="max-w-6xl mx-auto"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div 
-          className="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-blue-50 px-8 py-4 rounded-full border border-purple-100 shadow-lg mb-8"
-          role="heading"
-          aria-level={1}
+        <motion.div
+          className="py-6 md:py-10"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          <motion.div
-            className="p-2 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg"
-            whileHover={{ rotate: 15 }}
-          >
-            <Sparkles className="w-7 h-7 text-purple-600" />
-          </motion.div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Order Details
+          <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-800">
+            Order Creation
           </h1>
-        </div>
+          <p className="mt-2 text-center text-gray-600">
+            Place your customization order from bohurupi.com
+          </p>
+          <motion.div
+            className="flex justify-center mt-4"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            
+          </motion.div>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Order Details Section */}

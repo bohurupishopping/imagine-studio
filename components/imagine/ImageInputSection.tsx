@@ -41,10 +41,12 @@ export default function ImageInputSection({
         <motion.div
           className={cn(
             "relative flex flex-col gap-3 md:gap-4 rounded-xl",
-            "transition-all duration-300 ease-in-out"
+            "transition-all duration-300 ease-in-out",
+            "outline-none focus-visible:outline-blue-500"
           )}
           whileHover={{ scale: 1.005 }}
           whileTap={{ scale: 0.99 }}
+          style={{ outline: 'none' }}
         >
           {/* Text Input */}
           <Textarea
@@ -53,32 +55,35 @@ export default function ImageInputSection({
             onChange={(e) => {
               setPrompt(e.target.value);
               e.target.style.height = 'auto';
-              e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+              e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
             }}
             placeholder="Describe your image..."
             className={cn(
-              "w-full min-h-[60px] md:min-h-[80px] max-h-[120px] p-2 md:p-3",
-              "bg-white/50 dark:bg-gray-800/50 rounded-lg",
-              "border border-white/30 dark:border-gray-700/50",
-              "text-gray-800 dark:text-gray-100 text-sm",
+              "w-full min-h-[48px] max-h-[200px] p-3",
+              "bg-white/50 dark:bg-gray-800/50 rounded-xl",
+              "border-2 border-white/30 dark:border-gray-700/50",
+              "ring-1 ring-inset ring-white/50 dark:ring-gray-700/50",
+              "text-sm leading-5",
               "placeholder:text-gray-400/80 dark:placeholder:text-gray-500/80",
-              "focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50",
+              "focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50",
               "transition-all duration-200 ease-out",
-              "[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+              "[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
+              "resize-none",
+              "shadow-sm hover:shadow-md"
             )}
           />
 
           {/* Bottom Controls */}
           <div className="flex flex-col gap-2">
             {/* Controls Container */}
-            <div className="flex flex-row gap-1.5 w-full">
+            <div className="flex flex-row gap-1 w-full">
               {/* Image Options Menu */}
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <ImageOptionsMenu onStyleChange={handleStyleChange} />
               </div>
               
               {/* Buttons */}
-              <div className="flex gap-1.5">
+              <div className="flex gap-1">
                 {/* Enhance Button */}
                 <Button
                   type="button"
@@ -138,9 +143,9 @@ export default function ImageInputSection({
                   }}
                   disabled={!prompt.trim() || isEnhancing}
                   className={cn(
-                    "h-9 w-full px-2 md:px-3",
+                    "h-8 w-full px-2",
                     "bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700",
-                    "text-white text-xs md:text-sm font-medium rounded-xl",
+                    "text-white text-xs font-medium rounded-lg",
                     "disabled:opacity-50 disabled:cursor-not-allowed",
                     "transition-all duration-200 ease-out",
                     "flex items-center justify-center gap-1",
@@ -161,9 +166,9 @@ export default function ImageInputSection({
                   onClick={() => onGenerate(prompt)}
                   disabled={isLoading || !prompt.trim()}
                   className={cn(
-                    "h-9 w-full px-2 md:px-3",
+                    "h-8 w-full px-2",
                     "bg-gradient-to-br from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700",
-                    "text-white text-xs md:text-sm font-medium rounded-xl",
+                    "text-white text-xs font-medium rounded-lg",
                     "disabled:opacity-50 disabled:cursor-not-allowed",
                     "transition-all duration-200 ease-out",
                     "flex items-center justify-center gap-1",

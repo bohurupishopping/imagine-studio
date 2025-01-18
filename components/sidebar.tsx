@@ -20,6 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface SidebarProps {
   currentPath: string;
+  className?: string;
 }
 
 interface NavItemProps {
@@ -35,12 +36,12 @@ const NavItem = memo(({ item, currentPath }: NavItemProps) => (
   <Link
     href={item.href}
     className={cn(
-      'flex items-center gap-5 rounded-xl px-5 py-4',
-      'text-muted-foreground transition-all',
-      'hover:text-primary hover:bg-background/50',
-      'active:scale-95 active:bg-background/70',
+      'flex items-center gap-5 rounded-2xl px-5 py-4',
+      'text-muted-foreground transition-all duration-200 ease-in-out',
+      'hover:text-primary hover:bg-background/30',
+      'active:scale-95 active:bg-background/50',
       'justify-start',
-      currentPath === item.href && 'bg-violet-500/20 text-violet-700 dark:text-violet-300'
+      currentPath === item.href && 'bg-violet-500/10 text-violet-700 dark:text-violet-300 shadow-sm'
     )}
   >
     <div className={cn(
@@ -237,9 +238,9 @@ SidebarContent.displayName = 'SidebarContent';
 export function Sidebar({ currentPath }: SidebarProps) {
   return (
     <aside className={cn(
-      'fixed h-screen w-72 bg-white/40 dark:bg-gray-800/40 backdrop-blur-lg',
-      'border-r border-white/40 dark:border-gray-700/40 shadow-lg',
-      'text-foreground',
+      'fixed h-screen w-72 bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl',
+      'border-r border-white/50 dark:border-gray-700/50 shadow-xl',
+      'text-foreground transition-all duration-300 ease-in-out',
       'hidden lg:block' // Hide on mobile, show on desktop (lg breakpoint)
     )}>
       <SidebarContent currentPath={currentPath} />

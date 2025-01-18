@@ -13,7 +13,7 @@ interface ImagePreviewProps {
 
 export default function ImagePreview({ src, alt, prompt, onClose }: ImagePreviewProps) {
   return (
-    <div className="relative aspect-square w-full h-full rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <div className="relative aspect-square w-full h-full rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 md:w-[400px] md:h-[400px]">
       <Image
         src={src}
         alt={alt}
