@@ -121,13 +121,16 @@ Provide a "Place Order" button for save the all the design table data (learn tab
 Backend Actions:
 1. Fetch "design" details from the supabase db table for the user id, 
 2. Fetch order details from the WooCommerce REST API:
-3. Validate the order ID and ensure the payment status is completed/paid.
+3. Validate the order ID and ensure the payment status is completed/paid. 
+**Completed**
 
+**working**
 Combine data:
-Image URL (from Supabase Storage).
-Text customization details (from Supabase database).
+Image URL (public_url from Supabase database)).
+Selected Text customization details (from Supabase database).
 Order details (from WooCommerce).
-Store the combined data in a new Supabase database table.
+Store the combined data in a new Supabase database table "order" (we also need sql to create this table).
+
 State Management:
 
 Maintain the fetched order details in local state until saved.

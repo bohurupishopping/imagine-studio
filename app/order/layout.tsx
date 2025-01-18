@@ -12,14 +12,16 @@ export default function OrderLayout({
   const pathname = usePathname();
   
   return (
-    <div className="h-full">
+    <div className="min-h-screen flex flex-col">
       <div className="hidden md:flex h-full w-[72px] z-30 flex-col fixed inset-y-0">
         <Sidebar currentPath={pathname} />
       </div>
-      <main className="md:pl-[72px] h-full">
+      <main className="md:pl-[72px] flex-1 pb-20 md:pb-0">
         {children}
-        <MobileFooter />
       </main>
+      <div className="fixed bottom-0 w-full md:hidden">
+        <MobileFooter />
+      </div>
     </div>
   );
 }
