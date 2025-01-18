@@ -135,7 +135,7 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative bg-gradient-to-br from-gray-100 via-purple-50 to-blue-100">
+    <div className="min-h-[calc(100vh-4rem)] relative bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto flex flex-col min-h-[calc(100dvh-4rem)] relative z-10 px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -143,11 +143,11 @@ export default function GeneratePage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-800">
+          <h1 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">
             AI Image Generator
           </h1>
-          <p className="mt-2 text-center text-gray-600">
-            Create stunning images with the power of AI
+          <p className="mt-2 text-center text-gray-600/80 max-w-2xl mx-auto">
+            Create stunning images with the power of AI. Our advanced algorithms can turn your ideas into beautiful visuals in seconds.
           </p>
         </motion.div>
 
@@ -158,7 +158,7 @@ export default function GeneratePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="border-none shadow-xl rounded-2xl bg-white/90 backdrop-blur-md">
+          <Card className="border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
             <CardContent className="p-4">
               <ImageInputSection
                 onGenerate={handleGenerate}
@@ -177,11 +177,11 @@ export default function GeneratePage() {
             transition={{ delay: 0.3 }}
           >
             {generatedImages.length > 0 ? (
-              <div className="grid grid-cols-2 gap-2 md:grid-cols-3 md:gap-4 pb-24">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 pb-24 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
                 {generatedImages.map((image, index) => (
                   <motion.div
                     key={index}
-                    className="relative group rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl bg-white/80 backdrop-blur-md border border-white/40 aspect-square"
+                    className="relative group rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-2xl bg-white/80 backdrop-blur-md border border-white/40 aspect-square hover:border-purple-200/50 hover:scale-[1.02]"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
@@ -201,10 +201,10 @@ export default function GeneratePage() {
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent rounded-b-xl">
                       <button
-                        className={`w-full text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 shadow-md ${
+                      className={`w-full text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg ${
                           image.saved 
-                            ? 'bg-green-600 hover:bg-green-700' 
-                            : 'bg-blue-600 hover:bg-blue-700'
+                            ? 'bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800' 
+                            : 'bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
                         }`}
                         onClick={() => {
                           if (image.saved) {
@@ -226,17 +226,24 @@ export default function GeneratePage() {
                 ))}
               </div>
             ) : (
-              <div className="flex items-center justify-center h-[40vh] bg-white/50 backdrop-blur-sm rounded-xl p-6">
-                <motion.div 
-                  className="text-center text-gray-500"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <ImageIcon className="w-12 h-12 mx-auto mb-3 text-gray-400/50" />
-                  <p className="text-base font-medium">
-                    Start creating! Enter a prompt above.
-                  </p>
-                </motion.div>
+              <div className="flex items-center justify-center h-[40vh]">
+                <Card className="w-full max-w-2xl border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+                  <CardContent className="flex flex-col items-center justify-center p-12 text-center">
+                    <motion.div
+                      className="text-center space-y-3"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <Sparkles className="w-12 h-12 text-purple-500/70 mx-auto" />
+                      <h3 className="text-xl font-semibold bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                        Ready to Create
+                      </h3>
+                      <p className="text-gray-600/90 text-sm max-w-md mx-auto">
+                        Enter a prompt above to start generating amazing AI images
+                      </p>
+                    </motion.div>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </motion.div>
@@ -325,42 +332,50 @@ export default function GeneratePage() {
         {/* Loading Overlay */}
         {isLoading && (
           <motion.div
-            className="fixed inset-0 bg-white/90 backdrop-blur-xl flex items-center justify-center z-50"
+            className="fixed inset-0 bg-white/80 backdrop-blur-md flex items-center justify-center z-50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
             <motion.div
-              className="flex flex-col items-center gap-5 bg-gradient-to-br from-white/80 to-purple-50/80 p-10 rounded-3xl border border-white/50 shadow-2xl backdrop-blur-md"
+              className="flex flex-col items-center gap-6 bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 p-12 rounded-2xl border border-white/40 shadow-2xl backdrop-blur-md hover:border-purple-200/50 transition-all duration-300"
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+              transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 25 }}
             >
-              <motion.div
-                className="relative"
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-              >
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 blur-md opacity-50 animate-pulse" />
-                <div className="relative rounded-full h-16 w-16 border-4 border-purple-600 border-t-transparent" />
-              </motion.div>
-              <motion.p
-                className="text-2xl font-bold bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                Crafting your vision...
-              </motion.p>
-              <motion.p
-                className="text-gray-600 text-sm mt-1 font-medium"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                This usually takes 10-20 seconds
-              </motion.p>
+              <div className="relative flex items-center justify-center">
+                <motion.div
+                  className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600/20 to-blue-600/20 blur-xl"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                />
+                <motion.div
+                  className="relative"
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                >
+                  <div className="h-16 w-16 rounded-full border-4 border-purple-600/30 border-t-purple-600" />
+                </motion.div>
+              </div>
+              <div className="space-y-2 text-center">
+                <motion.h3
+                  className="text-2xl font-bold bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  Crafting your vision...
+                </motion.h3>
+                <motion.p
+                  className="text-gray-600/90 text-sm"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  This usually takes 10-20 seconds
+                </motion.p>
+              </div>
             </motion.div>
           </motion.div>
         )}

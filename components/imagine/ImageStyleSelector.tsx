@@ -68,10 +68,10 @@ export default function ImageStyleSelector({ onStyleChange, className }: ImageSt
             className,
             "flex items-center justify-between gap-1",
             "rounded-full",
-            "bg-white/50 dark:bg-gray-800/50",
-            "border border-white/30 dark:border-gray-700/50",
-            "hover:border-blue-300/50 dark:hover:border-blue-700/50",
-            "text-white",
+            "bg-gray-100/90 dark:bg-gray-800/50",
+            "border border-gray-200 dark:border-gray-700/50",
+            "hover:bg-gray-200/90 hover:border-gray-300",
+            "text-gray-600",
             "shadow-lg",
             "group transition-all duration-200"
           )}
