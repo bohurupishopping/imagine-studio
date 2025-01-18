@@ -376,36 +376,26 @@ export default function OrderPage() {
                           </button>
                         </TableCell>
                         <TableCell className="p-2">
-                          <div className="space-y-2">
+                          <div className="space-y-1 text-sm">
                             {design.text1 && (
-                              <div className="flex flex-col space-y-1.5 p-3 bg-gray-50/80 backdrop-blur-sm rounded-lg border border-gray-100/60 shadow-sm">
-                                <span className="text-xs font-medium bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                                  Text 1
-                                </span>
-                                <span className="text-sm text-gray-700">{design.text1}</span>
-                                <div className="flex items-center gap-2 text-xs text-gray-500">
-                                  <span>Font: <span className="text-gray-700">{design.font1}</span></span>
-                                  <span className="flex items-center gap-1">
-                                    Color:
-                                    <div className="w-3 h-3 rounded-full border shadow-sm" style={{ backgroundColor: design.color1 }} />
-                                  </span>
-                                  <span>Size: <span className="text-gray-700">{design.size1}</span></span>
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-gray-700">{design.text1}</span>
+                                  <div className="w-3 h-3 rounded-full border shadow-sm" style={{ backgroundColor: design.color1 }} />
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  <span>{design.font1}</span> · <span>{design.size1}</span>
                                 </div>
                               </div>
                             )}
                             {design.text2 && (
-                              <div className="flex flex-col space-y-1.5 p-3 bg-gray-50/80 backdrop-blur-sm rounded-lg border border-gray-100/60 shadow-sm">
-                                <span className="text-xs font-medium bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                                  Text 2
-                                </span>
-                                <span className="text-sm text-gray-700">{design.text2}</span>
-                                <div className="flex items-center gap-2 text-xs text-gray-500">
-                                  <span>Font: <span className="text-gray-700">{design.font2}</span></span>
-                                  <span className="flex items-center gap-1">
-                                    Color:
-                                    <div className="w-3 h-3 rounded-full border shadow-sm" style={{ backgroundColor: design.color2 }} />
-                                  </span>
-                                  <span>Size: <span className="text-gray-700">{design.size2}</span></span>
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium text-gray-700">{design.text2}</span>
+                                  <div className="w-3 h-3 rounded-full border shadow-sm" style={{ backgroundColor: design.color2 }} />
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  <span>{design.font2}</span> · <span>{design.size2}</span>
                                 </div>
                               </div>
                             )}

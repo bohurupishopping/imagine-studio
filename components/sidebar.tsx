@@ -100,12 +100,13 @@ const SidebarContent = memo(({ currentPath }: SidebarContentProps) => {
 
   const mainItems = [
     { href: '/dashboard', icon: <LayoutDashboard className="h-6 w-6" />, label: 'Dashboard' },
-    { href: '/imagine', icon: <Image className="h-6 w-6" />, label: 'Generate' },
-    { href: '/order', icon: <History className="h-6 w-6" />, label: 'View Order' },
+    { href: '/imagine', icon: <Image className="h-6 w-6" />, label: 'Create Image' },
+    { href: '/order', icon: <History className="h-6 w-6" />, label: 'Create Order' },
   ];
 
   const supportItems = [
-    { href: '/dashboard/settings', icon: <Settings className="h-6 w-6" />, label: 'Settings' },
+    { href: 'https://bohurupi.com/track/', icon: <Settings className="h-6 w-6" />, label: 'Track Order' },
+    { href: 'https://bohurupi.com/contact/', icon: <Settings className="h-6 w-6" />, label: 'Conact Us' },
   ];
 
   return (

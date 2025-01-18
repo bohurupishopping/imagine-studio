@@ -10,17 +10,14 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-white via-purple-50 to-blue-50">
-      <Sidebar currentPath="/dashboard" />
-      <motion.main 
-        className="flex-1 md:ml-64 p-4 md:p-8 pb-20 md:pb-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        {children}
-      </motion.main>
-      <MobileFooter />
+    <div className="flex flex-col h-[100dvh]">
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar currentPath="/dashboard" className="hidden md:block" />
+        <main className="flex-1 md:ml-64 p-4 md:px-4 md:pt-4 pb-24 md:pb-4">
+          {children}
+        </main>
+      </div>
+      <MobileFooter className="md:hidden" />
     </div>
   );
 }
