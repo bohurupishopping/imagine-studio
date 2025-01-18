@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, memo } from 'react';
+import { useState, useCallback, memo, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { 
@@ -64,9 +64,28 @@ interface SidebarContentProps {
 
 const SidebarContent = memo(({ currentPath }: SidebarContentProps) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [user, setUser] = useState<{ email?: string; displayName?: string }>({});
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setUser({
+            email: user.email || '',
+            displayName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    fetchUser();
+  }, [supabase]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -187,15 +206,15 @@ const SidebarContent = memo(({ currentPath }: SidebarContentProps) => {
                 <Avatar className="h-11 w-11 border-2 border-violet-500/20 shadow-md">
                   <AvatarImage src="" sizes="40px" alt="" />
                   <AvatarFallback className="bg-violet-500 text-white font-semibold">
-                    {getInitials('user@example.com')}
+                    {getInitials(user.email || '')}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col items-start">
-                  <span className="text-base font-semibold line-clamp-1">
-                    User
+                  <span className="text-sm font-semibold line-clamp-1">
+                    {user.displayName || 'User'}
                   </span>
-                  <span className="text-sm text-muted-foreground/80 line-clamp-1">
-                    user@example.com
+                  <span className="text-xs text-muted-foreground/80 line-clamp-1">
+                    {user.email || 'Loading...'}
                   </span>
                 </div>
               </button>
