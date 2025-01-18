@@ -224,7 +224,7 @@ export default function OrderPage() {
                   onClick={handleFetchOrder}
                   className="h-9 text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
                 >
-                  Fetch Order
+                  Find Order
                 </Button>
               </div>
             </div>
