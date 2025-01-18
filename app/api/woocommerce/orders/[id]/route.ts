@@ -6,9 +6,9 @@ const CONSUMER_SECRET = process.env.WOO_CONSUMER_SECRET;
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = context.params;
 
   if (!CONSUMER_KEY || !CONSUMER_SECRET) {
     return NextResponse.json(
@@ -40,8 +40,9 @@ export async function GET(
 
     return NextResponse.json(order);
   } catch (error) {
+    console.error("Error fetching order:", error);
     return NextResponse.json(
-      { error: "Failed to fetch order" },
+      { error: "An unexpected error occurred while fetching the order" },
       { status: 500 }
     );
   }
