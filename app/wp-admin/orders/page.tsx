@@ -3,6 +3,18 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { toast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
@@ -68,6 +80,45 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<OrderDetails | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const itemsPerPage = 10;
+
+  const handleStatusUpdate = async (orderId: number, newStatus: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .update({ woocommerce_status: newStatus })
+        .eq('id', orderId)
+        .select();
+
+      if (error) throw error;
+      
+      if (data && data.length > 0) {
+        // Update local state with fresh data from Supabase
+        setOrders(prev => prev.map(order => 
+          order.id === orderId 
+            ? { ...order, ...data[0] } 
+            : order
+        ));
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error);
+    }
+  };
+
+  const handleDelete = async (orderId: number) => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .delete()
+        .eq('id', orderId);
+
+      if (error) throw error;
+      
+      // Refresh orders
+      setOrders(prev => prev.filter(order => order.id !== orderId));
+    } catch (error) {
+      console.error('Error deleting order:', error);
+    }
+  };
 
   const handleRowClick = async (orderId: number) => {
     try {
@@ -221,24 +272,96 @@ export default function OrdersPage() {
               <TableBody>
                 {orders.map((order) => (
                   <TableRow 
-                    key={order.id}
+                    key={order.id} 
+                    className="hover:bg-gray-50 transition-colors cursor-pointer"
                     onClick={() => handleRowClick(order.id)}
-                    className="cursor-pointer hover:bg-gray-50 transition-colors"
                   >
                     <TableCell className="font-medium">{order.woocommerce_number}</TableCell>
                     <TableCell>{`${order.billing_first_name} ${order.billing_last_name}`}</TableCell>
                     <TableCell>{order.billing_email}</TableCell>
                     <TableCell>${order.woocommerce_total}</TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-sm ${
-                        order.woocommerce_status === 'completed'
-                          ? 'bg-green-100 text-green-800'
-                          : order.woocommerce_status === 'processing'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {order.woocommerce_status}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              await handleStatusUpdate(order.id, 'completed');
+                              toast({
+                                title: 'Success',
+                                description: 'Order status updated to completed',
+                                variant: 'default',
+                              });
+                            } catch (error) {
+                              toast({
+                                title: 'Error',
+                                description: 'Failed to update order status',
+                                variant: 'destructive',
+                              });
+                            }
+                          }}
+                          disabled={order.woocommerce_status === 'completed'}
+                          className="h-7 text-xs"
+                        >
+                          Mark Complete
+                        </Button>
+                        <span className={`px-2 py-1 rounded-full text-sm ${
+                          order.woocommerce_status === 'completed'
+                            ? 'bg-green-100 text-green-800'
+                            : order.woocommerce_status === 'processing'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {order.woocommerce_status}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => e.stopPropagation()}
+                            className="h-7 text-xs"
+                          >
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the order.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={async (e) => {
+                                try {
+                                  await handleDelete(order.id);
+                                  toast({
+                                    title: 'Success',
+                                    description: 'Order deleted successfully',
+                                    variant: 'default',
+                                  });
+                                } catch (error) {
+                                  toast({
+                                    title: 'Error',
+                                    description: 'Failed to delete order',
+                                    variant: 'destructive',
+                                  });
+                                }
+                              }}
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </TableCell>
                     <TableCell>{new Date(order.created_at).toLocaleString()}</TableCell>
                     <TableCell>{new Date(order.updated_at).toLocaleString()}</TableCell>
