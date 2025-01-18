@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import { X, Sparkles, TextCursor, Type, Image as ImageIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FONT_OPTIONS, useFontLoader } from '@/lib/fonts';
 
 interface TextCustomizationPopupProps {
   imageUrl: string;
@@ -28,12 +29,6 @@ interface TextCustomizationPopupProps {
     size2: number;
   }) => Promise<void>;
 }
-
-const FONT_OPTIONS = [
-  { value: 'Noto Sans Bengali', label: 'Noto Sans' },
-  { value: 'Hind Siliguri', label: 'Hind Siliguri' },
-  { value: 'Kalpurush', label: 'Kalpurush' }
-];
 
 const SIZE_OPTIONS = [
   { value: 20, label: 'Small' },
@@ -61,6 +56,19 @@ export function TextCustomizationPopup({
   onSave
 }: TextCustomizationPopupProps) {
   const { toast } = useToast();
+
+  // Load fonts
+  useEffect(() => {
+    const { injectFontStyles } = useFontLoader();
+    const style = injectFontStyles();
+
+    // Cleanup on unmount
+    return () => {
+      if (style && document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
+  }, []);
   const [text1, setText1] = useState('');
   const [text2, setText2] = useState('');
   const [font1, setFont1] = useState(FONT_OPTIONS[0].value);
