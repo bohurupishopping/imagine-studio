@@ -63,6 +63,17 @@ create policy "Users can delete their own orders"
 on orders for delete
 using (auth.uid() = user_id);
 
+-- Admin policy to view all orders
+create policy "Admins can view all orders"
+on orders for select
+using (
+  exists (
+    select 1 from profiles
+    where profiles.user_id = auth.uid()
+    and profiles.role = 'admin'
+  )
+);
+
 -- Create index for faster user-specific queries
 create index idx_orders_user_id on orders (user_id);
 

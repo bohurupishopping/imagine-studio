@@ -18,20 +18,38 @@ export async function middleware(request: NextRequest) {
 
   // Protected routes
   const protectedRoutes = ['/dashboard', '/imagine', '/settings'];
+  const adminRoutes = ['/wp-admin'];
   
-  // Redirect unauthenticated users from protected routes
-  if (!session && protectedRoutes.some(route =>
+  // Check for authentication on protected routes
+  if (!session && [...protectedRoutes, ...adminRoutes].some(route =>
     request.nextUrl.pathname.startsWith(route)
   )) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  // Set auth header for API routes
-  if (request.nextUrl.pathname.startsWith('/api')) {
-    response.headers.set(
-      'Authorization',
-      `Bearer ${session?.access_token}`
-    );
+  // Special handling for admin routes
+  if (session && request.nextUrl.pathname.startsWith('/wp-admin')) {
+    try {
+      // Check for admin role
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (error || !profile || profile.role !== 'admin') {
+        console.log('Access denied - not admin:', { profile, error });
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
+
+      // Redirect root admin path to dashboard
+      if (request.nextUrl.pathname === '/wp-admin') {
+        return NextResponse.redirect(new URL('/wp-admin/wp-dashboard', request.url));
+      }
+    } catch (error) {
+      console.error('Error in admin check:', error);
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
   }
 
   return response;
