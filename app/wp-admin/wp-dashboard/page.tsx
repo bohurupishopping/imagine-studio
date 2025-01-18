@@ -1,77 +1,313 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+'use client';
 
-export default async function AdminDashboard() {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore });
-  
-  // Get session and verify authentication
-  const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-  
-  if (sessionError || !session) {
-    console.error('Session error:', sessionError);
-    redirect('/');
-  }
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { LayoutDashboard, User as UserIcon, Shield, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-  // Get user data from authenticated endpoint
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
-  
-  if (userError || !user) {
-    console.error('User verification failed:', userError);
-    redirect('/');
-  }
+interface User {
+  id: string;
+  email?: string;
+  created_at?: string;
+}
 
-  // Get profile data with role information
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user.id)
-    .single();
+interface Profile {
+  user_id: string;
+  role: string;
+  updated_at?: string;
+}
 
-  if (profileError || !profile) {
-    console.error('Profile error:', profileError);
-    redirect('/wp-admin/setup');
-  }
+export default function AdminDashboard() {
+  const router = useRouter();
+  const supabase = createClientComponentClient();
+  const [isLoading, setIsLoading] = useState(true);
+  const [userData, setUserData] = useState<User | null>(null);
+  const [profileData, setProfileData] = useState<Profile | null>(null);
 
-  if (profile.role !== 'admin') {
-    console.log('Not an admin:', profile);
-    redirect('/dashboard');
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Get session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session) {
+          throw new Error('Session error');
+        }
+
+        // Get user data
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        
+        if (userError || !user) {
+          throw new Error('User verification failed');
+        }
+
+        // Get profile data
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profileError || !profile || profile.role !== 'admin') {
+          throw new Error('Invalid admin profile');
+        }
+
+        setUserData(user);
+        setProfileData(profile);
+      } catch (error) {
+        console.error('Admin dashboard error:', error);
+        router.push('/');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [supabase, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500" />
+      </div>
+    );
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-4xl font-bold mb-8">Admin Dashboard</h1>
-      
-      <div className="grid gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Administrator Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-gray-500">Email:</label>
-                <p className="text-lg">{user.email}</p>
+    <div className="min-h-[calc(100vh-4rem)] relative bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 backdrop-blur-sm">
+      <div className="max-w-7xl mx-auto flex flex-col min-h-[calc(100dvh-4rem)] relative z-10 px-2 sm:px-4 lg:px-8">
+        {/* Header */}
+        <motion.div
+          className="py-6 md:py-10"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg">
+                <Shield className="w-6 h-6 text-purple-600" />
               </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">User ID:</label>
-                <p className="text-lg">{user.id}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Role:</label>
-                <p className="text-lg capitalize">{profile.role}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-500">Last Updated:</label>
-                <p className="text-lg">
-                  {new Date(profile.updated_at).toLocaleString()}
-                </p>
-              </div>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Admin Dashboard
+              </h1>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
+
+        {/* Admin Info Cards */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          {/* Orders Card */}
+          <motion.div whileHover={{ scale: 1.02 }}>
+            <Card 
+              className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200 cursor-pointer"
+              onClick={() => router.push('/wp-admin/orders')}
+            >
+              <CardHeader className="space-y-1 p-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
+                    <Calendar className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-semibold text-purple-600">
+                      View Orders
+                    </CardTitle>
+                    <p className="text-sm text-gray-600">Manage and track customer orders</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600">View and manage all customer orders, track their status, and handle order fulfillment.</p>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                    onClick={() => router.push('/wp-admin/orders')}
+                  >
+                    View Orders
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Admin Profile Card */}
+          <motion.div whileHover={{ scale: 1.02 }}>
+            <Card className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+              <CardHeader className="space-y-1 p-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
+                    <UserIcon className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-semibold text-purple-600">
+                      Admin Profile
+                    </CardTitle>
+                    <p className="text-sm text-gray-600">Your account information</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Email:</span>
+                    <span className="text-sm font-medium">{userData?.email}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Role:</span>
+                    <span className="text-sm font-medium capitalize">{profileData?.role}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Last Updated:</span>
+                    <span className="text-sm font-medium">
+                      {profileData?.updated_at ? new Date(profileData.updated_at).toLocaleString() : 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* System Info Card */}
+          <motion.div whileHover={{ scale: 1.02 }}>
+            <Card className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+              <CardHeader className="space-y-1 p-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                    <LayoutDashboard className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-semibold text-blue-600">
+                      System Information
+                    </CardTitle>
+                    <p className="text-sm text-gray-600">Platform status and metrics</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">User ID:</span>
+                    <span className="text-sm font-medium">{userData?.id}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-gray-600">Account Created:</span>
+                    <span className="text-sm font-medium">
+                      {userData?.created_at ? new Date(userData.created_at).toLocaleDateString() : 'N/A'}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
+
+        {/* How It Works Section */}
+        <motion.div
+          className="mt-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Admin Features
+            </h2>
+            <p className="mt-2 text-gray-600">Key features for managing your store</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Feature 1 */}
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <Card className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+                <CardHeader className="space-y-1 p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
+                      <span className="text-purple-600 font-bold">1</span>
+                    </div>
+                    <CardTitle className="text-xl font-semibold text-purple-600">
+                      Order Management
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <p className="text-sm text-gray-600">
+                    View, track, and manage all customer orders in one place
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Feature 2 */}
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <Card className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+                <CardHeader className="space-y-1 p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                      <span className="text-blue-600 font-bold">2</span>
+                    </div>
+                    <CardTitle className="text-xl font-semibold text-blue-600">
+                      User Management
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <p className="text-sm text-gray-600">
+                    Manage user accounts, roles, and permissions
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Feature 3 */}
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <Card className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+                <CardHeader className="space-y-1 p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
+                      <span className="text-purple-600 font-bold">3</span>
+                    </div>
+                    <CardTitle className="text-xl font-semibold text-purple-600">
+                      Analytics
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <p className="text-sm text-gray-600">
+                    View sales data and platform analytics
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Feature 4 */}
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <Card className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+                <CardHeader className="space-y-1 p-4">
+                  <div className="flex items-center gap-2">
+                    <div className="p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                      <span className="text-blue-600 font-bold">4</span>
+                    </div>
+                    <CardTitle className="text-xl font-semibold text-blue-600">
+                      Settings
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-4 pt-0">
+                  <p className="text-sm text-gray-600">
+                    Configure platform settings and preferences
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
