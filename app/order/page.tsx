@@ -3,7 +3,7 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, X } from "lucide-react";
+import { Search, Sparkles, X } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "../../components/ui/visually-hidden";
 import { WooCommerceOrder } from "@/types/woocommerce";
@@ -189,19 +189,22 @@ export default function OrderPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <motion.div
-          className="py-8 md:py-12"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+          <motion.div
+            className="py-4 md:py-6"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
           <h1 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            Order Creation
+            Customization Order
           </h1>
-          <p className="mt-3 text-center text-gray-600/90 text-sm md:text-base">
-            Place your customization order from bohurupi.com
+          <p className="mt-2 text-center text-gray-600/90 text-sm md:text-base max-w-2xl mx-auto">
+            To place your order: 
+            1. Find your order ID from your bohurupi.com purchase confirmation email
+            2. Enter it below to fetch your order details
+            3. Select a design and complete the order
           </p>
           <motion.div
-            className="flex justify-center mt-6"
+            className="flex justify-center mt-2"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2 }}
@@ -209,10 +212,19 @@ export default function OrderPage() {
           </motion.div>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
           {/* Order Details Section */}
           <Card className="p-6 border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
             <div className="space-y-3">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <Search className="w-5 h-5 text-purple-600" />
+                  <h2 className="text-xl font-bold bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                    Find Your Order
+                  </h2>
+                </div>
+                <p className="text-xs text-gray-500 pl-7">Enter your order ID to fetch details and final your order</p>
+              </div>
               <div className="flex items-center gap-2">
                 <Input
                   placeholder="Order ID"
@@ -227,6 +239,22 @@ export default function OrderPage() {
                   Find Order
                 </Button>
               </div>
+              {!orderDetails && (
+                <motion.div
+                  className="mt-3 text-center"
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: orderDetails ? 0 : 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Button
+                    variant="link"
+                    className="text-purple-600 hover:text-purple-700 text-sm"
+                    onClick={() => window.open('https://bohurupi.com/bengali-customized-t-shirts/', '_blank')}
+                  >
+                    Don't have an order ID? Get one here
+                  </Button>
+                </motion.div>
+              )}
             </div>
 
             {orderError && (

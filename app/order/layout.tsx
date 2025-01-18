@@ -17,7 +17,7 @@ export default function OrderLayout({
         <Sidebar currentPath={pathname} />
       </div>
       <main className="md:pl-[72px] flex-grow flex flex-col">
-        <div className="flex-grow overflow-y-auto">
+        <div className="flex-grow overflow-y-auto pb-16 md:pb-0">
           {children}
         </div>
       </main>

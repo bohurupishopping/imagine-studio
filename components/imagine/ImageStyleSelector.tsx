@@ -50,7 +50,7 @@ interface ImageStyleSelectorProps {
 }
 
 export default function ImageStyleSelector({ onStyleChange, className }: ImageStyleSelectorProps) {
-  const [selectedStyle, setSelectedStyle] = useState('minimalist');
+  const [selectedStyle, setSelectedStyle] = useState('graphic');
 
   const handleStyleSelect = (styleId: string) => {
     setSelectedStyle(styleId);
