@@ -339,7 +339,7 @@ export default function OrderPage() {
                 className="border-purple-500 text-purple-500 hover:bg-purple-50"
                 onClick={() => window.location.href = "/imagine"}
               >
-                Create Design
+                Create Design 
               </Button>
             </Card>
           ) : (

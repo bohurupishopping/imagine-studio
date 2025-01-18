@@ -30,10 +30,13 @@ export async function GET(
 
     const order: WooCommerceOrder = await response.json();
 
-    // Validate order status - only reject failed orders
-    if (order.status === "failed") {
+    // Validate order status - only accept processing orders
+    if (order.status !== "processing") {
       return NextResponse.json(
-        { error: "Order payment failed" },
+        { 
+          error: "Only paid orders that are currently in 'processing' status can be used for customization. Please place a new order and use that for customization. If you believe this is an error, please contact us at care@bohurupi.com",
+          status: order.status 
+        },
         { status: 400 }
       );
     }
