@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { handleError, handleSupabaseError } from '@/utils/errorHandler';
 import { useLoading } from '@/hooks/useLoading';
+import { ErrorDisplay } from '@/components/others/error-display';
 
 interface GeneratedImage {
   url: string;
@@ -55,7 +56,11 @@ export default function GeneratePage() {
     checkSession();
   }, [supabase, router]);
 
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+
   const handleGenerate = async (prompt: string) => {
+    setRateLimitError(null);
+    
     if (!prompt.trim()) {
       toast({
         title: 'Error',
@@ -70,6 +75,16 @@ export default function GeneratePage() {
         prompt,
         size: '1024x1024',
       });
+
+      if (response.error && response.error.includes('Daily limit reached')) {
+        setRateLimitError(response.error);
+        toast({
+          title: 'Limit Reached',
+          description: response.error,
+          variant: 'destructive',
+        });
+        return;
+      }
 
       if (response.success && response.data[0]?.url) {
         const newImage = {
@@ -170,6 +185,16 @@ export default function GeneratePage() {
 
         {/* Main Preview Area */}
         <div className="flex-1 mb-6 md:mb-8">
+          {rateLimitError && (
+            <motion.div
+              className="mb-4"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <ErrorDisplay message={rateLimitError} />
+            </motion.div>
+          )}
           <motion.div
             className="w-full"
             initial={{ opacity: 0, y: 20 }}

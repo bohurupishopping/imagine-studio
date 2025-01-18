@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { createServiceClient } from '@/utils/supabase/server';
 import { v4 as uuidv4 } from 'uuid';
+import { checkRateLimit } from '@/utils/rateLimiter';
 
 type ImageSize = '1024x1024' | '1024x1792' | '1792x1024';
 
@@ -69,6 +70,21 @@ const formatEnhancedPrompt = (
 
 export async function POST(request: Request) {
   try {
+    // Get user ID from session (you'll need to implement this)
+    const userId = 'temp-user-id'; // TODO: Replace with actual user ID from auth
+    
+    // Check rate limit
+    const { allowed, remaining } = checkRateLimit(userId);
+    if (!allowed) {
+      return NextResponse.json(
+        { 
+          success: false,
+          error: `Daily limit reached. You can generate ${remaining} more images tomorrow.`
+        },
+        { status: 429 }
+      );
+    }
+
     const { prompt, model = 'black-forest-labs/FLUX.1-schnell-Free', size = '1200x1200', style = 'photo-realism' } = await request.json();
 
     if (!prompt) {
