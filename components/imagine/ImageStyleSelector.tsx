@@ -46,9 +46,10 @@ export const imageStyles = {
 
 interface ImageStyleSelectorProps {
   onStyleChange: (style: string) => void;
+  className?: string;
 }
 
-export default function ImageStyleSelector({ onStyleChange }: ImageStyleSelectorProps) {
+export default function ImageStyleSelector({ onStyleChange, className }: ImageStyleSelectorProps) {
   const [selectedStyle, setSelectedStyle] = useState('minimalist');
 
   const handleStyleSelect = (styleId: string) => {
@@ -63,13 +64,15 @@ export default function ImageStyleSelector({ onStyleChange }: ImageStyleSelector
           variant="ghost"
           size="sm"
           className={cn(
-            "h-8 w-[110px] px-2",
+            "h-10 w-[140px] px-4",
+            className,
             "flex items-center justify-between gap-1",
-            "rounded-lg",
+            "rounded-full",
             "bg-white/50 dark:bg-gray-800/50",
             "border border-white/30 dark:border-gray-700/50",
             "hover:border-blue-300/50 dark:hover:border-blue-700/50",
-            "hover:shadow-sm",
+            "text-white",
+            "shadow-lg",
             "group transition-all duration-200"
           )}
         >

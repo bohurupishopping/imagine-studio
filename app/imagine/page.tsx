@@ -169,7 +169,7 @@ export default function GeneratePage() {
         </motion.div>
 
         {/* Main Preview Area */}
-        <div className="flex-1 overflow-auto mb-6 md:mb-8">
+        <div className="flex-1 mb-6 md:mb-8">
           <motion.div
             className="w-full"
             initial={{ opacity: 0, y: 20 }}
