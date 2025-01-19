@@ -2,6 +2,7 @@
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,7 +19,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Sparkles, X } from 'lucide-react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 
 interface Design {
   id: number;
@@ -42,6 +45,7 @@ export default function MyDesignsPage() {
   const supabase = createClientComponentClient();
   const [designs, setDesigns] = useState<Design[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDesigns = async () => {
@@ -112,42 +116,84 @@ export default function MyDesignsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] p-4">
-        <div className="max-w-7xl mx-auto space-y-4">
-          <div className="flex justify-between items-center">
-            <Skeleton className="h-10 w-48" />
-            <Skeleton className="h-10 w-32" />
+      <div className="bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 p-4 min-h-screen backdrop-blur-sm">
+        <motion.div
+          className="max-w-7xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="space-y-4">
+            <motion.div
+              className="py-4 md:py-6"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Skeleton className="h-10 w-48 mx-auto" />
+              <Skeleton className="h-4 w-64 mt-2 mx-auto" />
+            </motion.div>
+            
+            <Card className="p-4 space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="flex items-center gap-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                >
+                  <Skeleton className="h-20 w-20 rounded-lg" />
+                  <Skeleton className="h-4 flex-1" />
+                  <Skeleton className="h-10 w-10 rounded-md" />
+                  <Skeleton className="h-4 w-24" />
+                </motion.div>
+              ))}
+            </Card>
           </div>
-          
-          <Card className="p-4 space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center gap-4">
-                <Skeleton className="h-20 w-20 rounded-lg" />
-                <Skeleton className="h-4 flex-1" />
-                <Skeleton className="h-10 w-10 rounded-md" />
-                <Skeleton className="h-4 w-24" />
-              </div>
-            ))}
-          </Card>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] p-4">
-      <div className="max-w-7xl mx-auto space-y-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">My Designs</h1>
-          <Button>Create New Design</Button>
-        </div>
+    <div className="bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 p-4 md:pl-[78px] min-h-screen backdrop-blur-sm">
+      <motion.div
+        className="max-w-7xl mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <motion.div
+          className="py-4 md:py-6"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <h1 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            My Designs
+          </h1>
+          <p className="mt-2 text-center text-gray-600/90 text-sm md:text-base max-w-2xl mx-auto">
+            View and manage all your created designs. Click on any design to preview it in full size.
+          </p>
+        </motion.div>
 
         <Card className="p-4">
           {designs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               {designs.map((design) => (
-                <div key={design.id} className="border rounded-lg overflow-hidden">
-                  <div className="relative aspect-square">
+                <motion.div
+                  key={design.id}
+                  className="border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div 
+                    className="relative aspect-square cursor-pointer"
+                    onClick={() => setPreviewImage(design.public_url)}
+                  >
                     <Image
                       src={design.public_url}
                       alt="Design preview"
@@ -194,16 +240,39 @@ export default function MyDesignsPage() {
                       </AlertDialog>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : (
             <div className="text-center py-8">
               <p className="text-gray-500">No designs found</p>
             </div>
           )}
         </Card>
-      </div>
+      </motion.div>
+
+      {/* Image Preview Dialog */}
+      <Dialog open={!!previewImage} onOpenChange={(open) => !open && setPreviewImage(null)}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden">
+          <VisuallyHidden>
+            <DialogTitle>Image Preview</DialogTitle>
+          </VisuallyHidden>
+          <div className="relative">
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute right-2 top-2 p-2 rounded-full bg-white/90 hover:bg-gray-100 transition-colors z-10"
+              aria-label="Close preview"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <img
+              src={previewImage || ''}
+              alt="Design preview"
+              className="w-full h-full object-contain max-h-[80vh]"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
