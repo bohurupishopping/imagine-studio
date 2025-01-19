@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import { Package, CreditCard, User, Palette, Type } from 'lucide-react';
+import { Package, CreditCard, User, Palette, Type, Calendar, CreditCard as Payment } from 'lucide-react';
+import { AspectRatio } from "@/components/ui/aspect-ratio"
 
 interface OrderDetails {
   id: number;
@@ -54,18 +55,90 @@ interface OrderDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+// Status Badge Component
+type OrderStatus = 'pending' | 'processing' | 'completed' | 'cancelled' | 'refunded' | 'failed';
+
+const StatusBadge = ({ status }: { status: string }) => {
+  const getStatusStyle = (status: string): string => {
+    const styles: Record<OrderStatus, string> = {
+      pending: 'bg-yellow-500 hover:bg-yellow-600',
+      processing: 'bg-blue-500 hover:bg-blue-600',
+      completed: 'bg-green-500 hover:bg-green-600',
+      cancelled: 'bg-red-500 hover:bg-red-600',
+      refunded: 'bg-purple-500 hover:bg-purple-600',
+      failed: 'bg-gray-500 hover:bg-gray-600',
+    };
+    
+    const normalizedStatus = status.toLowerCase() as OrderStatus;
+    return styles[normalizedStatus] || 'bg-gray-500 hover:bg-gray-600';
+  };
+
+  return (
+    <Badge 
+      className={`${getStatusStyle(status)} text-white font-medium transition-colors`}
+      aria-label={`Order status: ${status}`}
+    >
+      {status}
+    </Badge>
+  );
+};
+
+// Design Preview Component
+const DesignPreview = ({ url }: { url: string }) => (
+  <div className="flex flex-col items-center gap-2 sm:gap-3">
+    <div className="w-[96px] h-[96px] sm:w-[128px] sm:h-[128px] rounded-lg overflow-hidden shadow-lg border border-gray-200/50 bg-white relative group">
+      <AspectRatio ratio={1}>
+        <img
+          src={url}
+          alt="Design Preview"
+          className="w-full h-full object-contain"
+        />
+      </AspectRatio>
+    </div>
+    <Button
+      variant="outline"
+      size="sm"
+      asChild
+      className="w-full max-w-[96px] sm:max-w-[128px] text-xs sm:text-sm"
+    >
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open design in new tab"
+      >
+        <Package className="w-4 h-4 mr-2" />
+        View Design
+      </a>
+    </Button>
+  </div>
+);
+
+// Info Row Component
+const InfoRow = ({ label, value, icon: Icon }: { label: string; value: string | number; icon?: any }) => (
+  <div className="flex items-center justify-between gap-2 group">
+    <div className="flex items-center gap-2">
+      {Icon && <Icon className="w-4 h-4 text-purple-600 opacity-75 group-hover:opacity-100 transition-opacity" />}
+      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
+    </div>
+    <span className="text-sm text-gray-600 dark:text-gray-400">{value}</span>
+  </div>
+);
+
 export function OrderDetailsDialog({ order, open, onOpenChange }: OrderDetailsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 backdrop-blur-sm">
+      <DialogContent className="max-w-[90vw] sm:max-w-md md:max-w-xl lg:max-w-2xl bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 backdrop-blur-sm">
         <DialogHeader>
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between"
           >
-            <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Order Details - #{order.woocommerce_number}
+            <DialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              Order #{order.woocommerce_number}
             </DialogTitle>
+            <StatusBadge status={order.woocommerce_status} />
           </motion.div>
         </DialogHeader>
 
@@ -76,94 +149,52 @@ export function OrderDetailsDialog({ order, open, onOpenChange }: OrderDetailsDi
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
-              <CardHeader className="p-2">
+            <Card className="border border-purple-100 bg-white/90 backdrop-blur-md rounded-xl shadow-md hover:shadow-lg transition-all">
+              <CardHeader className="p-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-r from-purple-50 to-blue-50 rounded-md">
+                  <div className="p-1.5 bg-purple-50 rounded-md">
                     <Palette className="w-4 h-4 text-purple-600" />
                   </div>
-                  <CardTitle className="text-lg font-semibold text-purple-600">
-                    Design Details
-                  </CardTitle>
+                  <CardTitle className="text-lg font-semibold text-purple-600">Design Details</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="p-3 pt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-1.5">
-                      <Type className="w-3.5 h-3.5 text-purple-600" />
-                      <div>
-                        <p className="text-xs font-medium">Text 1</p>
-                        <p className="text-xs text-gray-600">{order.text1}</p>
-                      </div>
-                    </div>
-                    {order.text2 && (
-                      <div className="flex items-center gap-2">
-                        <Type className="w-4 h-4 text-purple-600" />
-                        <div>
-                          <p className="text-sm font-medium">Text 2</p>
-                          <p className="text-sm text-gray-600">{order.text2}</p>
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <Type className="w-4 h-4 text-purple-600" />
-                      <div>
-                        <p className="text-sm font-medium">Font 1</p>
-                        <p className="text-sm text-gray-600">{order.font1}</p>
-                      </div>
-                    </div>
-                    {order.font2 && (
-                      <div className="flex items-center gap-2">
-                        <Type className="w-4 h-4 text-purple-600" />
-                        <div>
-                          <p className="text-sm font-medium">Font 2</p>
-                          <p className="text-sm text-gray-600">{order.font2}</p>
-                        </div>
-                      </div>
-                    )}
+              <CardContent className="p-3 sm:p-4 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="space-y-3">
+                    <InfoRow label="Text 1" value={order.text1} icon={Type} />
+                    {order.text2 && <InfoRow label="Text 2" value={order.text2} icon={Type} />}
+                    <InfoRow label="Font 1" value={order.font1} icon={Type} />
+                    {order.font2 && <InfoRow label="Font 2" value={order.font2} icon={Type} />}
+                    
                     <div className="flex items-center gap-2">
                       <Palette className="w-4 h-4 text-purple-600" />
-                      <div>
-                        <p className="text-sm font-medium">Colors</p>
-                        <div className="flex gap-2">
+                      <span className="text-sm font-medium text-gray-700">Colors</span>
+                      <div className="flex gap-2">
+                        <span 
+                          className="inline-block w-4 h-4 rounded-full border shadow-sm"
+                          style={{ backgroundColor: order.color1 }}
+                          aria-label={`Color 1: ${order.color1}`}
+                        />
+                        {order.color2 && (
                           <span 
-                            className="inline-block w-4 h-4 rounded-full border"
-                            style={{ backgroundColor: order.color1 }}
+                            className="inline-block w-4 h-4 rounded-full border shadow-sm"
+                            style={{ backgroundColor: order.color2 }}
+                            aria-label={`Color 2: ${order.color2}`}
                           />
-                          {order.color2 && (
-                            <span 
-                              className="inline-block w-4 h-4 rounded-full border"
-                              style={{ backgroundColor: order.color2 }}
-                            />
-                          )}
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
                   
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Package className="w-4 h-4 text-purple-600" />
-                      <div>
-                        <p className="text-sm font-medium">Preview</p>
-                      </div>
-                    </div>
-                    <div className="w-full max-w-[200px] h-[200px] bg-gray-100 rounded-lg overflow-hidden shadow-sm flex items-center justify-center">
-                      <iframe
-                        src={order.public_url}
-                        className="w-full h-full border-0 object-contain"
-                        title="Design Preview"
-                        loading="lazy"
-                      />
-                    </div>
+                  <div className="flex flex-col items-center justify-center">
+                    <DesignPreview url={order.public_url} />
                   </div>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
 
-          <Separator className="my-6" />
+          <Separator className="my-4" />
 
           {/* Order Information */}
           <motion.div
@@ -171,64 +202,33 @@ export function OrderDetailsDialog({ order, open, onOpenChange }: OrderDetailsDi
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
-              <CardHeader className="p-3">
+            <Card className="border border-blue-100 bg-white/90 backdrop-blur-md rounded-xl shadow-md hover:shadow-lg transition-all">
+              <CardHeader className="p-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-r from-purple-50 to-blue-50 rounded-md">
-                    <Package className="w-4 h-4 text-purple-600" />
+                  <div className="p-1.5 bg-blue-50 rounded-md">
+                    <Package className="w-4 h-4 text-blue-600" />
                   </div>
-                  <CardTitle className="text-lg font-semibold text-purple-600">
-                    Order Information
-                  </CardTitle>
+                  <CardTitle className="text-lg font-semibold text-blue-600">Order Details</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="p-3 pt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Status</p>
-                      <Badge variant={order.woocommerce_status === 'completed' ? 'default' : 'secondary'}>
-                        {order.woocommerce_status}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Total</p>
-                      <p className="text-sm text-gray-600">${order.woocommerce_total.toFixed(2)}</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Created</p>
-                      <p className="text-sm text-gray-600">{format(new Date(order.created_at), 'PPpp')}</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Updated</p>
-                      <p className="text-sm text-gray-600">{format(new Date(order.updated_at), 'PPpp')}</p>
-                    </div>
-                  </div>
-                  
+              <CardContent className="p-4 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Product</p>
-                      <p className="text-sm text-gray-600">{order.line_item_name}</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Quantity</p>
-                      <p className="text-sm text-gray-600">{order.line_item_quantity}</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Price</p>
-                      <p className="text-sm text-gray-600">${order.line_item_price.toFixed(2)}</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Subtotal</p>
-                      <p className="text-sm text-gray-600">${order.line_item_subtotal.toFixed(2)}</p>
-                    </div>
+                    <InfoRow label="Created" value={format(new Date(order.created_at), 'PPpp')} icon={Calendar} />
+                    <InfoRow label="Updated" value={format(new Date(order.updated_at), 'PPpp')} icon={Calendar} />
+                    <InfoRow label="Total" value={`$${order.woocommerce_total.toFixed(2)}`} icon={Payment} />
+                  </div>
+                  <div className="space-y-3">
+                    <InfoRow label="Product" value={order.line_item_name} icon={Package} />
+                    <InfoRow label="Quantity" value={order.line_item_quantity} icon={Package} />
+                    <InfoRow label="Price" value={`$${order.line_item_price.toFixed(2)}`} icon={CreditCard} />
                   </div>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
 
-          <Separator className="my-6" />
+          <Separator className="my-4" />
 
           {/* Billing Information */}
           <motion.div
@@ -236,34 +236,27 @@ export function OrderDetailsDialog({ order, open, onOpenChange }: OrderDetailsDi
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
-              <CardHeader className="p-3">
+            <Card className="border border-green-100 bg-white/90 backdrop-blur-md rounded-xl shadow-md hover:shadow-lg transition-all">
+              <CardHeader className="p-4">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-gradient-to-r from-purple-50 to-blue-50 rounded-md">
-                    <User className="w-4 h-4 text-purple-600" />
+                  <div className="p-1.5 bg-green-50 rounded-md">
+                    <User className="w-4 h-4 text-green-600" />
                   </div>
-                  <CardTitle className="text-lg font-semibold text-purple-600">
-                    Billing Information
-                  </CardTitle>
+                  <CardTitle className="text-lg font-semibold text-green-600">Customer Details</CardTitle>
                 </div>
               </CardHeader>
-              <CardContent className="p-3 pt-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Name</p>
-                      <p className="text-sm text-gray-600">{order.billing_first_name} {order.billing_last_name}</p>
-                    </div>
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Email</p>
-                      <p className="text-sm text-gray-600">{order.billing_email}</p>
-                    </div>
+              <CardContent className="p-4 pt-0">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <InfoRow 
+                      label="Name" 
+                      value={`${order.billing_first_name} ${order.billing_last_name}`} 
+                      icon={User} 
+                    />
+                    <InfoRow label="Email" value={order.billing_email} icon={User} />
                   </div>
                   <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <p className="text-sm font-medium">Phone</p>
-                      <p className="text-sm text-gray-600">{order.billing_phone}</p>
-                    </div>
+                    <InfoRow label="Phone" value={order.billing_phone} icon={User} />
                   </div>
                 </div>
               </CardContent>
