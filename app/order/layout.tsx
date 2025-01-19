@@ -16,12 +16,12 @@ export default function OrderLayout({
       <div className="hidden md:flex h-full w-[72px] z-30 flex-col fixed inset-y-0">
         <Sidebar currentPath={pathname} />
       </div>
-      <main className="md:pl-[72px] flex-grow flex flex-col">
-        <div className="flex-grow overflow-y-auto pb-16 md:pb-0">
+      <main className="md:pl-[72px] flex-grow">
+        <div className="h-full">
           {children}
         </div>
       </main>
-      <div className="fixed bottom-0 w-full md:hidden h-16">
+      <div className="fixed bottom-0 w-full md:hidden">
         <MobileFooter />
       </div>
     </div>
