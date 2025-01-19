@@ -149,7 +149,7 @@ const SidebarContent = memo(({ currentPath }: SidebarContentProps) => {
           <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-violet-500 to-pink-500 bg-clip-text text-transparent">
             Imagine
           </h2>
-          <p className="text-xs font-medium text-muted-foreground/80">AI Image Generator</p>
+          <p className="text-xs font-medium text-muted-foreground/80">AI T-Shirt Image Generator App</p>
         </div>
       </div>
 
@@ -244,7 +244,7 @@ const SidebarContent = memo(({ currentPath }: SidebarContentProps) => {
         <div className="mt-4">
           <div className="rounded-xl bg-gray-100 dark:bg-gray-700 p-4">
             <p className="text-sm text-muted-foreground/70 text-center font-medium">
-              © 2024 Imagine App. All rights reserved.
+              © 2021-25 Bohurupi Shopping
             </p>
           </div>
         </div>

@@ -6,8 +6,8 @@ import { Toaster } from '@/components/ui/sonner';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Bohurupi Imagine | Create AI T-shirt',
-  description: 'Create unique AI-designed T-shirts instantly. Customize designs, colors, and styles with our powerful AI tools. Perfect for personal or business use.',
+  title: 'Bohurupi Shopping Studio | Bengali Graphic T-Shirts & AI T-Shirt Printing',
+  description: 'Discover unique Bengali graphic T-shirts with Bohurupi Shopping Studio. Specializing in AI-driven T-shirt printing, we bring you vibrant Bangla T-shirts that showcase culture and creativity. Perfect for every occasion!',
   icons: {
     icon: '/assets/ai-icon.png',
   },

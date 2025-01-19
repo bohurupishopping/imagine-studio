@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { handleError, handleSupabaseError } from '@/utils/errorHandler';
 import { useLoading } from '@/hooks/useLoading';
 import { ErrorDisplay } from '@/components/others/error-display';
@@ -10,6 +10,7 @@ import ImageInputSection from '@/components/imagine/ImageInputSection';
 import ImagePreview from '@/components/imagine/ImagePreview';
 import { imagineService } from '@/services/imagineService';
 import { Sparkles } from 'lucide-react';
+import { WelcomeSection } from '@/components/imagine/WelcomeSection';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { TextCustomizationPopup } from '@/components/imagine/TextCustomizationPopup';
@@ -46,6 +47,7 @@ export default function GeneratePage() {
   const [showTextPopup, setShowTextPopup] = useState(false);
   const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
   const [rateLimitError, setRateLimitError] = useState<string | null>(null);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -59,6 +61,7 @@ export default function GeneratePage() {
 
   const handleGenerate = async (prompt: string) => {
     setRateLimitError(null);
+    setShowWelcome(false);
     
     if (!prompt.trim()) {
       toast({
@@ -166,6 +169,16 @@ export default function GeneratePage() {
         </motion.div>
 
         {/* Input Section */}
+        {showWelcome && (
+          <WelcomeSection
+            onSuggestionClick={(prompt) => {
+              handleGenerate(prompt);
+              setShowWelcome(false);
+            }}
+            visible={generatedImages.length === 0}
+          />
+        )}
+
         <motion.div
           className="mb-6 md:mb-8 w-full md:max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
@@ -180,7 +193,9 @@ export default function GeneratePage() {
 
         {/* Main Preview Area */}
         <div className="flex-1">
-          {rateLimitError && (
+          {!showWelcome && (
+            <>
+              {rateLimitError && (
             <motion.div
               className="mb-4"
               initial={{ opacity: 0, y: -20 }}
@@ -191,13 +206,13 @@ export default function GeneratePage() {
             </motion.div>
           )}
           
-          <motion.div
-            className="w-full"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            {generatedImages.length > 0 ? (
+              <motion.div
+                className="w-full"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                {generatedImages.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 pb-20 md:pb-4">
                 {generatedImages.map((image, index) => (
                   <motion.div
@@ -246,8 +261,8 @@ export default function GeneratePage() {
                   </motion.div>
                 ))}
               </div>
-            ) : (
-              <div className="flex items-center justify-center h-[40vh]">
+                ) : (
+                  <div className="flex items-center justify-center h-[40vh]">
                 <Card className="w-full max-w-2xl border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
                   <CardContent className="flex flex-col items-center justify-center p-12 text-center">
                     <motion.div
@@ -265,9 +280,11 @@ export default function GeneratePage() {
                     </motion.div>
                   </CardContent>
                 </Card>
-              </div>
-            )}
-          </motion.div>
+                  </div>
+                )}
+              </motion.div>
+            </>
+          )}
         </div>
 
         {/* Fullscreen Image Modal */}
