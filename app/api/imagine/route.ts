@@ -3,6 +3,7 @@ import OpenAI from 'openai';
 import { createServiceClient } from '@/utils/supabase/server';
 import { v4 as uuidv4 } from 'uuid';
 import { checkRateLimit } from '@/utils/rateLimiter';
+import { imageStyles } from '@/components/imagine/ImageStyleSelector';
 
 type ImageSize = '1024x1024' | '1024x1792' | '1792x1024';
 
@@ -37,11 +38,22 @@ const client = new OpenAI({
 const formatEnhancedPrompt = (
   mainPrompt: string,
   size: ImageSize,
-  style?: string
+  style: keyof typeof imageStyles = 'graphic'
 ): { prompt: string; negative_prompt: string } => {
-  // T-shirt design focused prompt
+  // Style-specific prompts matching ImageStyleSelector
+  const stylePrompts: Record<keyof typeof imageStyles, string> = {
+    minimalist: 'minimalist design, clean lines, simple shapes, monochromatic color scheme, effective use of negative space, modern geometric patterns, flat design aesthetic',
+    vintage: 'vintage style, retro design elements, distressed textures, faded colors, classic typography, weathered old-school look, hand-drawn elements',
+    typography: 'typographic design, bold creative fonts, innovative text arrangement, clean layouts, balanced negative space, modern typographic compositions',
+    illustrative: 'illustrative design, hand-drawn elements, detailed line work, artistic compositions, artistic style, balanced detail',
+    graphic: 'graphic design, bold vibrant colors, geometric shapes, modern patterns, abstract compositions, effective color and shape balance',
+    'hand-drawn': 'hand-drawn style, sketch-like quality, organic shapes, artistic imperfections, creative illustrations, balanced detail'
+  };
+
+  // T-shirt design focused prompt with style-specific additions
   const enhancedPrompt = `
     ${mainPrompt},
+    ${stylePrompts[style] || stylePrompts.graphic},
     vector art, clean lines, simple shapes, bold colors, high contrast,
     white background, isolated elements, print-ready, scalable graphics,
     professional t-shirt design, commercial use, no background,

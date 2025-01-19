@@ -54,15 +54,15 @@ export const WelcomeSection = ({
   const suggestions = [
     {
       icon: Paintbrush,
-      title: "Urban Streetwear",
-      description: "Edgy designs for modern street style",
-      prompt: "urban streetwear design, bold typography, graffiti-inspired elements, distressed textures, edgy aesthetic, vibrant colors, hip-hop culture influences, oversized graphics, asymmetric layouts, distressed edges, urban decay textures, spray paint effects, street art style, high contrast colors, print-ready vector art, CMYK color mode, 300dpi, ready for screen printing"
+      title: "Indian Bong Girl Art",
+      description: "Stunning image with intricate traditional attire",
+      prompt: "A stunning Indian Bengali girl with intricate traditional attire, adorned with vibrant colorful patterns and ornaments, wearing a bright smile, surrounded by delicate henna designs on her hands, set against a clean white background, with her dark hair styled in an elegant braid, and a sprinkle of bindi on her forehead, showcasing the rich cultural heritage of Bengal."
     },
     {
       icon: PenTool,
-      title: "Vintage Retro",
-      description: "Nostalgic designs from past decades",
-      prompt: "vintage retro design, 80s/90s aesthetic, neon color palette, geometric shapes, pixel art elements, retro typography, faded textures, distressed effects, nostalgic patterns, old-school vibes, muted tones, halftone patterns, CMYK color mode, print-ready vector art, 300dpi, ready for screen printing"
+      title: "Indi Boy in Mountain",
+      description: "Nostalgic designs Indian boy",
+      prompt: "A young Indian boy with a bright smile and wind-swept hair, wearing a sleek black helmet and trendy riding gear, sits confidently on a powerful super bike, set against the majestic backdrop of the Himalayan mountains, with snow-capped peaks and lush green trees, the bike's vibrant colors and sleek design contrasting beautifully with the serene natural surroundings, the boy's hands gripping the handlebars, ready to take on the winding mountain roads."
     },
     {
       icon: Pencil,

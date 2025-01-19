@@ -112,7 +112,7 @@ Focus on hand-drawn t-shirt style:
 };
 
 export async function POST(req: Request) {
-  const { prompt, styleType = 'photo-realism', size = '1024x1024' } = await req.json();
+  const { prompt, styleType, size = '1024x1024' } = await req.json();
   
   if (!process.env.TOGETHER_API_KEY) {
     return NextResponse.json(

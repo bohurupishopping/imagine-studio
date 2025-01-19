@@ -36,6 +36,8 @@ const ImageInputSection: React.FC<ImageInputSectionProps> = ({
     }
   }, [prompt]);
 
+  const [selectedStyle, setSelectedStyle] = useState('graphic');
+
   const handleEnhance = async () => {
     setIsEnhancing(true);
     setEnhanceError(null);
@@ -46,7 +48,10 @@ const ImageInputSection: React.FC<ImageInputSectionProps> = ({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt })
+        body: JSON.stringify({ 
+          prompt,
+          styleType: selectedStyle 
+        })
       });
 
       if (!response.ok) {
