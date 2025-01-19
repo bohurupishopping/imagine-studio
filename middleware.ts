@@ -18,7 +18,13 @@ export async function middleware(request: NextRequest) {
 
   // Protected routes
   const protectedRoutes = ['/dashboard', '/imagine', '/settings'];
-  const adminRoutes = ['/wp-admin'];
+  const adminRoutes = [
+    '/wp-admin',
+    '/wp-admin/designs',
+    '/wp-admin/designs/(.*)',
+    '/wp-admin/files',
+    '/wp-admin/files/(.*)'
+  ];
   
   // Check for authentication on protected routes
   if (!session && [...protectedRoutes, ...adminRoutes].some(route =>

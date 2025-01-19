@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, User as UserIcon, Shield, Calendar } from 'lucide-react';
+import { LayoutDashboard, User as UserIcon, Shield, Calendar, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface User {
@@ -99,7 +99,7 @@ export default function AdminDashboard() {
 
         {/* Admin Info Cards */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8"
+          className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -137,6 +137,39 @@ export default function AdminDashboard() {
             </Card>
           </motion.div>
 
+          {/* Designs Card */}
+          <motion.div whileHover={{ scale: 1.02 }}>
+            <Card 
+              className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200 cursor-pointer"
+              onClick={() => router.push('/wp-admin/designs')}
+            >
+              <CardHeader className="space-y-1 p-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg">
+                    <ImageIcon className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-semibold text-purple-600">
+                      Manage Designs
+                    </CardTitle>
+                    <p className="text-sm text-gray-600">View and manage customer designs</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600">View and manage all customer designs, edit details, and handle design management.</p>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                    onClick={() => router.push('/wp-admin/designs')}
+                  >
+                    Manage Designs
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
           {/* Admin Profile Card */}
           <motion.div whileHover={{ scale: 1.02 }}>
             <Card className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
@@ -167,39 +200,6 @@ export default function AdminDashboard() {
                     <span className="text-sm text-gray-600">Last Updated:</span>
                     <span className="text-sm font-medium">
                       {profileData?.updated_at ? new Date(profileData.updated_at).toLocaleString() : 'N/A'}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* System Info Card */}
-          <motion.div whileHover={{ scale: 1.02 }}>
-            <Card className="h-full border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
-              <CardHeader className="space-y-1 p-4">
-                <div className="flex items-center gap-2">
-                  <div className="p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-                    <LayoutDashboard className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl font-semibold text-blue-600">
-                      System Information
-                    </CardTitle>
-                    <p className="text-sm text-gray-600">Platform status and metrics</p>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-0">
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">User ID:</span>
-                    <span className="text-sm font-medium">{userData?.id}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-gray-600">Account Created:</span>
-                    <span className="text-sm font-medium">
-                      {userData?.created_at ? new Date(userData.created_at).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
                 </div>
