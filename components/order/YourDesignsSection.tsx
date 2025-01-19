@@ -95,19 +95,19 @@ export function YourDesignsSection({ orderDetails, onPlaceOrder, onPreviewImage 
 
   if (loading) {
     return (
-      <Card className="p-6 border bg-white backdrop-blur-sm hover:shadow-lg transition-all duration-300 ease-in-out hover:border-purple-200 flex items-center justify-center">
+      <div className="flex items-center justify-center p-8">
         <div className="animate-pulse space-y-4">
           <div className="h-4 bg-gray-200 rounded w-32"></div>
           <div className="h-8 bg-gray-200 rounded"></div>
           <div className="h-8 bg-gray-200 rounded"></div>
         </div>
-      </Card>
+      </div>
     );
   }
 
   if (designs.length === 0) {
     return (
-      <Card className="p-6 border bg-white backdrop-blur-sm hover:shadow-lg transition-all duration-300 ease-in-out hover:border-purple-200 flex flex-col items-center justify-center space-y-4">
+      <div className="flex flex-col items-center justify-center space-y-4 p-8">
         <div className="text-center space-y-2">
           <Sparkles className="w-8 h-8 text-purple-500 mx-auto" />
           <h3 className="text-lg font-semibold text-gray-800">No Designs Found</h3>
@@ -120,18 +120,12 @@ export function YourDesignsSection({ orderDetails, onPlaceOrder, onPreviewImage 
         >
           Create Design 
         </Button>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="p-6 border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
-      <h2 className="text-sm font-semibold mb-4 flex items-center gap-2">
-        <Sparkles className="w-4 h-4 text-purple-600" />
-        <span className="bg-gradient-to-br from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          Your Designs
-        </span>
-      </h2>
+    <div className="space-y-4">
       <div className="overflow-x-auto rounded-lg border border-gray-100/80 shadow-sm">
         <Table className="min-w-full text-sm bg-white/60 backdrop-blur-sm">
           <TableHeader className="bg-gray-50/80">
@@ -209,6 +203,6 @@ export function YourDesignsSection({ orderDetails, onPlaceOrder, onPreviewImage 
           </TableBody>
         </Table>
       </div>
-    </Card>
+    </div>
   );
 }
