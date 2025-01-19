@@ -4,6 +4,16 @@ import { useState, useEffect } from 'react';
 import { handleError, handleSupabaseError } from '@/utils/errorHandler';
 import { useLoading } from '@/hooks/useLoading';
 import { ErrorDisplay } from '@/components/others/error-display';
+import { motion } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
+import ImageInputSection from '@/components/imagine/ImageInputSection';
+import ImagePreview from '@/components/imagine/ImagePreview';
+import { imagineService } from '@/services/imagineService';
+import { Sparkles } from 'lucide-react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useRouter } from 'next/navigation';
+import { TextCustomizationPopup } from '@/components/imagine/TextCustomizationPopup';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface GeneratedImage {
   url: string;
@@ -25,16 +35,6 @@ interface ImageGenerationResponse {
   }>;
   error?: string;
 }
-import { motion } from 'framer-motion';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
-import ImageInputSection from '@/components/imagine/ImageInputSection';
-import ImagePreview from '@/components/imagine/ImagePreview';
-import { imagineService } from '@/services/imagineService';
-import { Wand2, Image as ImageIcon, Sparkles } from 'lucide-react';
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { useRouter } from 'next/navigation';
-import { TextCustomizationPopup } from '@/components/imagine/TextCustomizationPopup';
 
 export default function GeneratePage() {
   const { toast } = useToast();
@@ -45,6 +45,7 @@ export default function GeneratePage() {
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [showTextPopup, setShowTextPopup] = useState(false);
   const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
+  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -55,8 +56,6 @@ export default function GeneratePage() {
     };
     checkSession();
   }, [supabase, router]);
-
-  const [rateLimitError, setRateLimitError] = useState<string | null>(null);
 
   const handleGenerate = async (prompt: string) => {
     setRateLimitError(null);
@@ -150,8 +149,8 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] relative bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto flex flex-col min-h-[calc(100dvh-4rem)] relative z-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
         {/* Header */}
         <motion.div
           className="py-6 md:py-10"
@@ -173,18 +172,14 @@ export default function GeneratePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
-            <CardContent className="p-4">
-              <ImageInputSection
-                onGenerate={handleGenerate}
-                isLoading={isLoading}
-              />
-            </CardContent>
-          </Card>
+          <ImageInputSection
+            onGenerate={handleGenerate}
+            isLoading={isLoading}
+          />
         </motion.div>
 
         {/* Main Preview Area */}
-        <div className="flex-1 mb-6 md:mb-8">
+        <div className="flex-1">
           {rateLimitError && (
             <motion.div
               className="mb-4"
@@ -195,6 +190,7 @@ export default function GeneratePage() {
               <ErrorDisplay message={rateLimitError} />
             </motion.div>
           )}
+          
           <motion.div
             className="w-full"
             initial={{ opacity: 0, y: 20 }}
@@ -202,7 +198,7 @@ export default function GeneratePage() {
             transition={{ delay: 0.3 }}
           >
             {generatedImages.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 pb-24 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 pb-20 md:pb-4">
                 {generatedImages.map((image, index) => (
                   <motion.div
                     key={index}
@@ -226,10 +222,10 @@ export default function GeneratePage() {
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent rounded-b-xl">
                       <button
-                      className={`w-full text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 shadow-md hover:shadow-lg ${
+                        className={`w-full text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 ${
                           image.saved 
                             ? 'bg-gradient-to-br from-green-600 to-green-700 hover:from-green-700 hover:to-green-800' 
-                            : 'bg-gradient-to-br from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                            : 'bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
                         }`}
                         onClick={() => {
                           if (image.saved) {
@@ -344,7 +340,6 @@ export default function GeneratePage() {
 
                 if (error) throw error;
                 
-                // Navigate to order page after successful save
                 router.push('/order');
               } catch (error) {
                 handleSupabaseError(error, toast);
