@@ -73,7 +73,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="p-4 pt-0">
                 <div className="space-y-3">
-                  <p className="text-sm text-gray-600">Create stunning AI-generated images for your t-shirts and merchandise with our advanced image generation tools.</p>
+                  <p className="text-sm text-gray-600">Create stunning AI-generated images for your t-shirts with our advanced image generation tools.</p>
                   <Button 
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
                     onClick={() => router.push('/imagine')}
@@ -103,12 +103,42 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent className="p-4 pt-0">
                 <div className="space-y-3">
-                  <p className="text-sm text-gray-600">Convert your AI-generated designs into custom merchandise. Place orders and track their progress easily.</p>
+                  <p className="text-sm text-gray-600">Convert your AI-generated designs into custom merchandise. Place orders easily.</p>
                   <Button 
                     className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                     onClick={() => router.push('/order')}
                   >
                     Place Order
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* My Designs Card */}
+          <motion.div whileHover={{ scale: 1.02 }}>
+            <Card className="border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
+              <CardHeader className="space-y-1 p-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                    <Image className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-semibold text-blue-600">
+                      My Designs
+                    </CardTitle>
+                    <p className="text-sm text-gray-600">View and manage your designs</p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-600">Access all your created designs, edit text, and manage your design library.</p>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+                    onClick={() => router.push('/my-designs')}
+                  >
+                    View Designs
                   </Button>
                 </div>
               </CardContent>

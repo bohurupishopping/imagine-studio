@@ -71,8 +71,9 @@ MobileNavItem.displayName = 'MobileNavItem';
 const NAV_ITEMS = [
   { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/imagine', icon: Image, label: 'Create Image' },
+  { href: '/my-designs', icon: Image, label: 'My Designs' },
   { href: '/order', icon: History, label: 'Create Order' },
-  { href: 'https://bohurupi.com/my-account/', icon: Settings, label: 'My Account' },
+  
 ];
 
 interface MobileFooterProps {

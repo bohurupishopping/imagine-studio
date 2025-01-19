@@ -19,8 +19,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { Trash2, Sparkles, X } from 'lucide-react';
+import { Trash2, Sparkles, X, Pencil } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { TextCustomizationPopup } from '@/components/imagine/TextCustomizationPopup';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
 
 interface Design {
@@ -46,6 +47,46 @@ export default function MyDesignsPage() {
   const [designs, setDesigns] = useState<Design[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [editDesign, setEditDesign] = useState<Design | null>(null);
+  const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
+
+  const handleSaveEdit = async (data: {
+    text1: string;
+    text2: string;
+    font1: string;
+    font2: string;
+    color1: string;
+    color2: string;
+    size1: number;
+    size2: number;
+  }) => {
+    if (!editDesign) return;
+
+    const { error } = await supabase
+      .from('designs')
+      .update({
+        ...data,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', editDesign.id);
+
+    if (error) {
+      toast({
+        title: "Error updating design",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+
+    setDesigns(prev =>
+      prev.map(d =>
+        d.id === editDesign.id
+          ? { ...d, ...data, updated_at: new Date().toISOString() }
+          : d
+      )
+    );
+  };
 
   useEffect(() => {
     const fetchDesigns = async () => {
@@ -179,7 +220,7 @@ export default function MyDesignsPage() {
         <Card className="p-4">
           {designs.length > 0 ? (
             <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              className="grid grid-cols-2 md:grid-cols-6 gap-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -199,16 +240,28 @@ export default function MyDesignsPage() {
                       alt="Design preview"
                       fill
                       className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
+                      sizes="(max-width: 768px) 50vw, 16.66vw"
                     />
                   </div>
                   <div className="p-4">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-semibold">{design.prompt}</h3>
                         <p className="text-sm text-gray-600">
                           Created: {new Date(design.created_at).toLocaleDateString()}
                         </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-blue-600 hover:text-blue-700"
+                          onClick={() => {
+                            setEditDesign(design);
+                            setIsEditPopupOpen(true);
+                          }}
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
                       </div>
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
@@ -273,6 +326,30 @@ export default function MyDesignsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Popup */}
+      {isEditPopupOpen && editDesign && (
+        <TextCustomizationPopup
+          imageUrl={editDesign.public_url}
+          prompt=""
+          filePath={editDesign.id.toString()}
+          onClose={() => {
+            setIsEditPopupOpen(false);
+            setEditDesign(null);
+          }}
+          onSave={handleSaveEdit}
+          initialData={{
+            text1: editDesign.text1 || "",
+            text2: editDesign.text2 || "",
+            font1: editDesign.font1 || "",
+            font2: editDesign.font2 || "",
+            color1: editDesign.color1 || "#000000",
+            color2: editDesign.color2 || "#000000",
+            size1: editDesign.size1 || 40,
+            size2: editDesign.size2 || 40
+          }}
+        />
+      )}
     </div>
   );
 }
