@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Pencil } from "lucide-react";
+import { TextCustomizationPopup } from "@/components/imagine/TextCustomizationPopup";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -36,6 +37,51 @@ export function YourDesignsSection({ orderDetails, onPlaceOrder, onPreviewImage 
   const supabase = createClientComponentClient();
   const [designs, setDesigns] = useState<Design[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editDesign, setEditDesign] = useState<Design | null>(null);
+  const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
+
+  const handleEditDesign = (design: Design) => {
+    setEditDesign(design);
+    setIsEditPopupOpen(true);
+  };
+
+  const handleSaveEdit = async (data: {
+    text1: string;
+    text2: string;
+    font1: string;
+    font2: string;
+    color1: string;
+    color2: string;
+    size1: number;
+    size2: number;
+  }) => {
+    if (!editDesign) return;
+
+    const { error } = await supabase
+      .from('designs')
+      .update({
+        ...data,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', editDesign.id);
+
+    if (error) {
+      toast({
+        title: "Error updating design",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+
+    setDesigns(prev =>
+      prev.map(d =>
+        d.id === editDesign.id
+          ? { ...d, ...data, updated_at: new Date().toISOString() }
+          : d
+      )
+    );
+  };
 
   useEffect(() => {
     const fetchDesigns = async () => {
@@ -95,13 +141,15 @@ export function YourDesignsSection({ orderDetails, onPlaceOrder, onPreviewImage 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-32"></div>
-          <div className="h-8 bg-gray-200 rounded"></div>
-          <div className="h-8 bg-gray-200 rounded"></div>
+    <div className="bg-white rounded-lg p-6 sm:p-8">
+      <div className="flex items-center justify-center">
+        <div className="animate-pulse space-y-4 w-full max-w-sm">
+          <div className="h-4 bg-gray-200 rounded w-32 mx-auto"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
         </div>
       </div>
+    </div>
     );
   }
 
@@ -138,7 +186,7 @@ export function YourDesignsSection({ orderDetails, onPlaceOrder, onPreviewImage 
           <TableBody>
             {designs.map((design) => (
               <TableRow key={design.id} className="hover:bg-gray-50 transition-colors">
-                <TableCell className="p-2">
+                <TableCell className="p-1.5 sm:p-2">
                   <button 
                     onClick={() => onPreviewImage(design.public_url)}
                     className="hover:opacity-80 transition-opacity"
@@ -147,7 +195,7 @@ export function YourDesignsSection({ orderDetails, onPlaceOrder, onPreviewImage 
                     <img 
                       src={design.public_url} 
                       alt="Design" 
-                      className="w-12 h-12 object-cover rounded border shadow-sm"
+                      className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded border shadow-sm"
                     />
                   </button>
                 </TableCell>
@@ -182,16 +230,25 @@ export function YourDesignsSection({ orderDetails, onPlaceOrder, onPreviewImage 
                     <Button
                       variant="outline"
                       size="sm"
-                      className="h-6 text-xs"
+                      className="h-7 text-xs px-2"
                       disabled={!orderDetails || !designs.length}
                       onClick={() => onPlaceOrder(design)}
                     >
                       Place Order
                     </Button>
                     <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs px-2 bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-700 border-blue-200"
+                      onClick={() => handleEditDesign(design)}
+                    >
+                      <Pencil className="w-3 h-3 mr-1" />
+                      Edit
+                    </Button>
+                    <Button
                       variant="destructive"
                       size="sm"
-                      className="h-6 text-xs"
+                      className="h-7 text-xs px-2"
                       onClick={() => handleDeleteDesign(design.id)}
                     >
                       Delete
@@ -203,6 +260,30 @@ export function YourDesignsSection({ orderDetails, onPlaceOrder, onPreviewImage 
           </TableBody>
         </Table>
       </div>
+
+      {/* Edit Popup */}
+      {isEditPopupOpen && editDesign && (
+        <TextCustomizationPopup
+          imageUrl={editDesign.public_url}
+          prompt=""
+          filePath={editDesign.id}
+          onClose={() => {
+            setIsEditPopupOpen(false);
+            setEditDesign(null);
+          }}
+          onSave={handleSaveEdit}
+          initialData={{
+            text1: editDesign.text1 || "",
+            text2: editDesign.text2 || "",
+            font1: editDesign.font1 || "",
+            font2: editDesign.font2 || "",
+            color1: editDesign.color1 || "#000000",
+            color2: editDesign.color2 || "#000000",
+            size1: editDesign.size1 || 40,
+            size2: editDesign.size2 || 40
+          }}
+        />
+      )}
     </div>
   );
 }

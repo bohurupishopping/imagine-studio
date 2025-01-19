@@ -28,6 +28,16 @@ interface TextCustomizationPopupProps {
     size1: number;
     size2: number;
   }) => Promise<void>;
+  initialData?: {
+    text1: string;
+    text2: string;
+    font1: string;
+    font2: string;
+    color1: string;
+    color2: string;
+    size1: number;
+    size2: number;
+  };
 }
 
 const SIZE_OPTIONS = [
@@ -53,7 +63,8 @@ export function TextCustomizationPopup({
   prompt,
   filePath,
   onClose,
-  onSave
+  onSave,
+  initialData
 }: TextCustomizationPopupProps) {
   const { toast } = useToast();
 
@@ -69,16 +80,16 @@ export function TextCustomizationPopup({
       }
     };
   }, []);
-  const [text1, setText1] = useState('');
-  const [text2, setText2] = useState('');
-  const [font1, setFont1] = useState(FONT_OPTIONS[0].value);
-  const [font2, setFont2] = useState(FONT_OPTIONS[0].value);
-  const [color1, setColor1] = useState('#000000');
-  const [color2, setColor2] = useState('#000000');
-  const [size1, setSize1] = useState([40]);
-  const [size2, setSize2] = useState([40]);
+  const [text1, setText1] = useState(initialData?.text1 ?? '');
+  const [text2, setText2] = useState(initialData?.text2 ?? '');
+  const [font1, setFont1] = useState(initialData?.font1 ?? FONT_OPTIONS[0].value);
+  const [font2, setFont2] = useState(initialData?.font2 ?? FONT_OPTIONS[0].value);
+  const [color1, setColor1] = useState(initialData?.color1 ?? '#000000');
+  const [color2, setColor2] = useState(initialData?.color2 ?? '#000000');
+  const [size1, setSize1] = useState([initialData?.size1 ?? 40]);
+  const [size2, setSize2] = useState([initialData?.size2 ?? 40]);
   const [isSaving, setIsSaving] = useState(false);
-  const [showText2, setShowText2] = useState(false);
+  const [showText2, setShowText2] = useState(!!initialData?.text2);
 
   const router = useRouter();
 
