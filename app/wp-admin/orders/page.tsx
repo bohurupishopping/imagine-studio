@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { OrderDetailsDialog } from './OrderDetailsDialog';
@@ -92,7 +92,6 @@ export default function OrdersPage() {
       if (error) throw error;
       
       if (data && data.length > 0) {
-        // Update local state with fresh data from Supabase
         setOrders(prev => prev.map(order => 
           order.id === orderId 
             ? { ...order, ...data[0] } 
@@ -111,12 +110,31 @@ export default function OrdersPage() {
         .delete()
         .eq('id', orderId);
 
-      if (error) throw error;
-      
-      // Refresh orders
+      if (error) {
+        toast({
+          title: "Error deleting order",
+          description: error.message,
+          variant: "destructive",
+        });
+        throw error;
+      }
+
       setOrders(prev => prev.filter(order => order.id !== orderId));
-    } catch (error) {
+      toast({
+        title: "Order deleted",
+        description: "The order has been successfully deleted",
+        variant: "default",
+      });
+
+    } catch (error: any) {
       console.error('Error deleting order:', error);
+      if (error?.message !== error?.code) {
+        toast({
+          title: "Error deleting order",
+          description: error?.message || "An unknown error occurred",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -124,43 +142,7 @@ export default function OrdersPage() {
     try {
       const { data, error } = await supabase
         .from('orders')
-        .select(`
-          id,
-          user_id,
-          design_id,
-          public_url,
-          text1,
-          text2,
-          font1,
-          font2,
-          color1,
-          color2,
-          size1,
-          size2,
-          woocommerce_id,
-          woocommerce_parent_id,
-          woocommerce_number,
-          woocommerce_status,
-          woocommerce_date_created,
-          woocommerce_total,
-          billing_first_name,
-          billing_last_name,
-          billing_email,
-          billing_phone,
-          line_item_id,
-          line_item_name,
-          line_item_product_id,
-          line_item_variation_id,
-          line_item_quantity,
-          line_item_price,
-          line_item_subtotal,
-          line_item_total,
-          line_item_sku,
-          line_item_meta_data,
-          status,
-          created_at,
-          updated_at
-        `)
+        .select(`*`)
         .eq('id', orderId)
         .single();
 
@@ -177,17 +159,7 @@ export default function OrdersPage() {
       try {
         const { data, error } = await supabase
           .from('orders')
-          .select(`
-            id,
-            woocommerce_number,
-            billing_first_name,
-            billing_last_name,
-            billing_email,
-            woocommerce_total,
-            woocommerce_status,
-            created_at,
-            updated_at
-          `)
+          .select(`*`)
           .order('created_at', { ascending: false })
           .range(
             (currentPage - 1) * itemsPerPage,
@@ -217,28 +189,27 @@ export default function OrdersPage() {
   return (
     <div className="min-h-[calc(100vh-4rem)] relative bg-gradient-to-br from-white via-purple-50/50 to-blue-50/50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto flex flex-col min-h-[calc(100dvh-4rem)] relative z-10 px-2 sm:px-4 lg:px-8">
-        {/* Header */}
         <motion.div
           className="py-6 md:py-10"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="p-2 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg">
-                  <Calendar className="w-6 h-6 text-purple-600" />
-                </div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                  Orders Management
-                </h1>
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg">
+                <Calendar className="w-6 h-6 text-purple-600" />
               </div>
-              <Button asChild variant="outline" className="gap-2">
-                <Link href="/wp-admin/wp-dashboard">
-                  <ChevronLeft className="w-4 h-4" />
-                  Dashboard
-                </Link>
-              </Button>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Orders Management
+              </h1>
             </div>
+            <Button asChild variant="outline" className="gap-2">
+              <Link href="/wp-admin/wp-dashboard">
+                <ChevronLeft className="w-4 h-4" />
+                Dashboard
+              </Link>
+            </Button>
+          </div>
         </motion.div>
 
         {selectedOrder && (
@@ -249,7 +220,6 @@ export default function OrdersPage() {
           />
         )}
 
-        {/* Orders Table */}
         <motion.div
           className="mb-8"
           initial={{ opacity: 0, y: 20 }}
@@ -258,35 +228,87 @@ export default function OrdersPage() {
         >
           <Card className="border border-white/40 bg-white/90 backdrop-blur-md rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:border-purple-200">
             <Table className="[&_th]:bg-white/50 [&_th]:backdrop-blur-md">
-              <TableHeader>
+              <TableHeader className="hidden sm:table-header-group">
                 <TableRow>
                   <TableHead>Order #</TableHead>
+                  <TableHead>Actions</TableHead>
                   <TableHead>Customer</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Total</TableHead>
+                  <TableHead className="hidden sm:table-cell">Email</TableHead>
+                  <TableHead className="hidden sm:table-cell">Total</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead>Updated At</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {orders.map((order) => (
                   <TableRow 
                     key={order.id} 
-                    className="hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => handleRowClick(order.id)}
+                    className="hover:bg-gray-50 transition-colors flex flex-wrap items-center justify-between gap-2 px-2 py-1.5 sm:table-row sm:py-0"
                   >
-                    <TableCell className="font-medium">{order.woocommerce_number}</TableCell>
-                    <TableCell>{`${order.billing_first_name} ${order.billing_last_name}`}</TableCell>
-                    <TableCell>{order.billing_email}</TableCell>
-                    <TableCell>${order.woocommerce_total}</TableCell>
+                    <TableCell className="font-medium text-sm sm:text-base">
+                      {order.woocommerce_number}
+                    </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={async (e) => {
-                            e.stopPropagation();
+                          onClick={() => handleRowClick(order.id)}
+                          className="h-8 text-sm px-3 bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100 text-purple-600 hover:text-purple-700 border-purple-200 hover:border-purple-300 shadow-sm hover:shadow-md transition-all"
+                        >
+                          View
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8 text-sm px-3 bg-gradient-to-r from-red-50 to-pink-50 hover:from-red-100 hover:to-pink-100 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300 shadow-sm hover:shadow-md transition-all"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete the order.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(order.id)}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm sm:text-base">
+                      <div className="flex items-center gap-1">
+                        {`${order.billing_first_name} ${order.billing_last_name}`}
+                        <span className={`px-1 py-[1px] rounded-full text-[11px] sm:text-sm ${
+                          order.woocommerce_status === 'completed'
+                            ? 'bg-green-100 text-green-800'
+                            : order.woocommerce_status === 'processing'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {order.woocommerce_status}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">{order.billing_email}</TableCell>
+                    <TableCell className="hidden sm:table-cell">${order.woocommerce_total}</TableCell>
+                    <TableCell className="hidden sm:table-cell">
+                      <div className="flex items-center gap-1.5">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
                             try {
                               await handleStatusUpdate(order.id, 'completed');
                               toast({
@@ -303,74 +325,17 @@ export default function OrdersPage() {
                             }
                           }}
                           disabled={order.woocommerce_status === 'completed'}
-                          className="h-7 text-xs"
+                          className="h-8 text-sm px-3"
                         >
-                          Mark Complete
+                          Complete
                         </Button>
-                        <span className={`px-2 py-1 rounded-full text-sm ${
-                          order.woocommerce_status === 'completed'
-                            ? 'bg-green-100 text-green-800'
-                            : order.woocommerce_status === 'processing'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {order.woocommerce_status}
-                        </span>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={(e) => e.stopPropagation()}
-                            className="h-7 text-xs"
-                          >
-                            Delete
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete the order.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={async (e) => {
-                                try {
-                                  await handleDelete(order.id);
-                                  toast({
-                                    title: 'Success',
-                                    description: 'Order deleted successfully',
-                                    variant: 'default',
-                                  });
-                                } catch (error) {
-                                  toast({
-                                    title: 'Error',
-                                    description: 'Failed to delete order',
-                                    variant: 'destructive',
-                                  });
-                                }
-                              }}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </TableCell>
-                    <TableCell>{new Date(order.created_at).toLocaleString()}</TableCell>
-                    <TableCell>{new Date(order.updated_at).toLocaleString()}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
 
-            {/* Pagination */}
             <div className="flex justify-between items-center p-4 border-t">
               <Button
                 variant="ghost"
