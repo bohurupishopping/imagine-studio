@@ -54,39 +54,21 @@ export const WelcomeSection = ({
   const suggestions = [
     {
       icon: Paintbrush,
-      title: "Minimalist Design",
-      description: "Clean and simple t-shirt graphics",
-      prompt: "minimalist design, clean lines, simple shapes, monochromatic color scheme, negative space, modern aesthetic, geometric patterns, flat design, vector art, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing"
-    },
-    {
-      icon: Sparkles,
-      title: "Vintage Style",
-      description: "Retro-inspired t-shirt designs",
-      prompt: "vintage t-shirt design, retro style, distressed textures, faded colors, classic typography, old school aesthetic, weathered look, hand-drawn elements, screen print effect, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing"
-    },
-    {
-      icon: Type,
-      title: "Typography Art",
-      description: "Creative text-based designs",
-      prompt: "typographic design, bold fonts, creative text arrangement, modern typography, clean layout, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing"
+      title: "Urban Streetwear",
+      description: "Edgy designs for modern street style",
+      prompt: "urban streetwear design, bold typography, graffiti-inspired elements, distressed textures, edgy aesthetic, vibrant colors, hip-hop culture influences, oversized graphics, asymmetric layouts, distressed edges, urban decay textures, spray paint effects, street art style, high contrast colors, print-ready vector art, CMYK color mode, 300dpi, ready for screen printing"
     },
     {
       icon: PenTool,
-      title: "Illustrative Design",
-      description: "Hand-drawn style illustrations",
-      prompt: "illustrative design, hand-drawn elements, detailed line work, creative composition, artistic style, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing"
-    },
-    {
-      icon: Palette,
-      title: "Graphic Patterns",
-      description: "Bold and colorful graphics",
-      prompt: "graphic design, bold colors, geometric shapes, modern patterns, abstract composition, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing"
+      title: "Vintage Retro",
+      description: "Nostalgic designs from past decades",
+      prompt: "vintage retro design, 80s/90s aesthetic, neon color palette, geometric shapes, pixel art elements, retro typography, faded textures, distressed effects, nostalgic patterns, old-school vibes, muted tones, halftone patterns, CMYK color mode, print-ready vector art, 300dpi, ready for screen printing"
     },
     {
       icon: Pencil,
-      title: "Hand-Drawn Art",
-      description: "Sketch-style t-shirt designs",
-      prompt: "hand-drawn design, sketch style, organic shapes, artistic imperfections, creative illustration, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing"
+      title: "Nature Inspired",
+      description: "Organic designs from the natural world",
+      prompt: "nature-inspired design, organic shapes, botanical elements, earthy color palette, watercolor textures, leaf patterns, floral motifs, natural textures, hand-painted effects, soft gradients, eco-friendly aesthetic, CMYK color mode, print-ready vector art, 300dpi, ready for screen printing"
     }
   ];
 

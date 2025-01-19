@@ -106,7 +106,7 @@ export default function GeneratePage() {
   };
 
   const handleSaveImage = async (imageUrl: string) => {
-    await withLoading(async () => {
+    try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('No active session');
@@ -148,7 +148,9 @@ export default function GeneratePage() {
         filePath
       });
       setShowTextPopup(true);
-    }, (error) => handleSupabaseError(error, toast));
+    } catch (error) {
+      handleSupabaseError(error, toast);
+    }
   };
 
   return (
