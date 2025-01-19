@@ -1,0 +1,209 @@
+'use client';
+
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { useEffect, useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/hooks/use-toast';
+import Image from 'next/image';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Trash2 } from 'lucide-react';
+
+interface Design {
+  id: number;
+  user_id: string;
+  image_url: string;
+  public_url: string;
+  prompt: string;
+  created_at: string;
+  updated_at: string;
+  text1?: string;
+  text2?: string;
+  font1?: string;
+  font2?: string;
+  color1?: string;
+  color2?: string;
+  size1?: number;
+  size2?: number;
+}
+
+export default function MyDesignsPage() {
+  const supabase = createClientComponentClient();
+  const [designs, setDesigns] = useState<Design[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDesigns = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) {
+          throw new Error('User not authenticated');
+        }
+
+        const { data, error } = await supabase
+          .from('designs')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setDesigns(data || []);
+      } catch (error) {
+        console.error('Error fetching designs:', error);
+        toast({
+          title: "Error loading designs",
+          description: "Failed to fetch your designs. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDesigns();
+  }, [supabase]);
+
+  const handleDelete = async (designId: number) => {
+    try {
+      const { error } = await supabase
+        .from('designs')
+        .delete()
+        .eq('id', designId);
+
+      if (error) {
+        toast({
+          title: "Error deleting design",
+          description: error.message,
+          variant: "destructive",
+        });
+        throw error;
+      }
+
+      setDesigns(prev => prev.filter(design => design.id !== designId));
+      toast({
+        title: "Design deleted",
+        description: "The design has been successfully deleted",
+        variant: "default",
+      });
+
+    } catch (error: any) {
+      console.error('Error deleting design:', error);
+      if (error?.message !== error?.code) {
+        toast({
+          title: "Error deleting design",
+          description: error?.message || "An unknown error occurred",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[calc(100vh-4rem)] p-4">
+        <div className="max-w-7xl mx-auto space-y-4">
+          <div className="flex justify-between items-center">
+            <Skeleton className="h-10 w-48" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+          
+          <Card className="p-4 space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <Skeleton className="h-20 w-20 rounded-lg" />
+                <Skeleton className="h-4 flex-1" />
+                <Skeleton className="h-10 w-10 rounded-md" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            ))}
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[calc(100vh-4rem)] p-4">
+      <div className="max-w-7xl mx-auto space-y-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-2xl font-bold">My Designs</h1>
+          <Button>Create New Design</Button>
+        </div>
+
+        <Card className="p-4">
+          {designs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {designs.map((design) => (
+                <div key={design.id} className="border rounded-lg overflow-hidden">
+                  <div className="relative aspect-square">
+                    <Image
+                      src={design.public_url}
+                      alt="Design preview"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold">{design.prompt}</h3>
+                        <p className="text-sm text-gray-600">
+                          Created: {new Date(design.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete your design.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(design.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No designs found</p>
+            </div>
+          )}
+        </Card>
+      </div>
+    </div>
+  );
+}
