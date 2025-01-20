@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Loader2, Sparkles } from 'lucide-react';
+import { GoogleOneTap } from '@/components/auth/GoogleOneTap';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');
@@ -148,7 +149,17 @@ export default function AuthPage() {
             </motion.div>
           </CardHeader>
           <CardContent className="p-6 pt-0">
-            <form onSubmit={handleAuth} className="space-y-4">
+            <div className="space-y-4">
+              <GoogleOneTap />
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">or</span>
+                </div>
+              </div>
+              <form onSubmit={handleAuth} className="space-y-4">
               {loading && (
                 <motion.div
                   className="fixed inset-0 bg-white/80 backdrop-blur-md flex items-center justify-center z-50"
@@ -376,6 +387,7 @@ export default function AuthPage() {
                 )}
               </motion.div>
             </form>
+            </div>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
