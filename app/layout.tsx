@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Bohurupi Shopping Studio | Bengali Graphic T-Shirts & AI T-Shirt Printing',
-  description: 'Discover unique Bengali graphic T-shirts with Bohurupi Shopping Studio. Specializing in AI-driven T-shirt printing, we bring you vibrant Bangla T-shirts that showcase culture and creativity. Perfect for every occasion!',
+  description: 'Discover best unique Bengali graphic T-shirts with Bohurupi Shopping Studio. Specializing in AI-driven T-shirt printing, we bring you vibrant Bangla T-shirts that showcase culture and creativity. Perfect for every occasion!',
   icons: {
     icon: '/assets/ai-icon.png',
   },
