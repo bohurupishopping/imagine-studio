@@ -38,77 +38,11 @@ Follow these guidelines:
 - Do NOT include phrases like "Enhanced prompt:" or "This prompt provides..."
 Do not include negative prompts or technical parameters - only enhance the descriptive content.`;
 
-  // Add style-specific guidance
-  switch(styleType) {
-    case 'minimalist':
-      return `${basePrompt}
-Focus on minimalist t-shirt design:
-- Use clean lines and simple shapes
-- Employ a monochromatic color scheme
-- Utilize negative space effectively
-- Create modern, geometric patterns
-- Maintain a flat design aesthetic
-- Ensure design is print-ready for t-shirts
-- Use isolated elements on white background`;
-    
-    case 'vintage':
-      return `${basePrompt}
-Focus on vintage t-shirt style:
-- Incorporate retro design elements
-- Add distressed textures and faded colors
-- Use classic typography
-- Create a weathered, old-school look
-- Include hand-drawn elements
-- Ensure design is print-ready for t-shirts
-- Use isolated elements on white background`;
-    
-    case 'typography':
-      return `${basePrompt}
-Focus on typographic t-shirt design:
-- Use bold, creative fonts
-- Arrange text in innovative ways
-- Maintain clean layouts
-- Balance text with negative space
-- Create modern typographic compositions
-- Ensure design is print-ready for t-shirts
-- Use isolated elements on white background`;
-    
-    case 'illustrative':
-      return `${basePrompt}
-Focus on illustrative t-shirt design:
-- Incorporate hand-drawn elements
-- Use detailed line work
-- Create artistic compositions
-- Maintain an artistic style
-- Balance detail with overall composition
-- Ensure design is print-ready for t-shirts
-- Use isolated elements on white background`;
-    
-    case 'graphic':
-      return `${basePrompt}
-Focus on graphic t-shirt design:
-- Use bold, vibrant colors
-- Incorporate geometric shapes
-- Create modern patterns
-- Develop abstract compositions
-- Balance color and shape effectively
-- Ensure design is print-ready for t-shirts
-- Use isolated elements on white background`;
-    
-    case 'hand-drawn':
-      return `${basePrompt}
-Focus on hand-drawn t-shirt style:
-- Maintain sketch-like quality
-- Use organic shapes
-- Incorporate artistic imperfections
-- Create creative illustrations
-- Balance detail with overall composition
-- Ensure design is print-ready for t-shirts
-- Use isolated elements on white background`;
-    
-    default:
-      return basePrompt;
-  }
+  // Add style-specific guidance from ImageStyleSelector
+  const stylePrompt = imageStyles[styleType as keyof typeof imageStyles]?.prompt || '';
+  
+  return `${basePrompt}
+${stylePrompt}`;
 };
 
 export async function POST(req: Request) {
@@ -186,15 +120,6 @@ export async function POST(req: Request) {
             if (line.startsWith('data:')) {
               const json = line.slice(5).trim();
               if (json === '[DONE]') {
-                // Append style keywords before closing
-                if (styleType in imageStyles) {
-                  const stylePrompt = imageStyles[styleType as keyof typeof imageStyles].prompt;
-                  const encoder = new TextEncoder();
-                  controller.enqueue(encoder.encode(`data: ${JSON.stringify({
-                    content: `, ${stylePrompt}`,
-                    done: true
-                  })}\n\n`));
-                }
                 controller.close();
                 return;
               }

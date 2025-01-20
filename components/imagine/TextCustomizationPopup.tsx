@@ -183,44 +183,42 @@ export function TextCustomizationPopup({
             <div className="space-y-4">
               <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg border border-white/60 p-3 sm:p-4">
                 <h3 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center gap-2 text-gray-700">
-                  <TextCursor className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  Text Preview
-                </h3>
-                <div className="space-y-2 sm:space-y-3">
-                  <div
-                    className="p-2 sm:p-3 bg-gray-50/80 rounded-lg border shadow-inner min-h-[50px] sm:min-h-[60px] flex items-center justify-center text-center"
-                    style={previewStyles1}
-                  >
-                    {text1 || 'Text 1 Preview'}
-                  </div>
-                  <AnimatePresence>
-                    {showText2 && (
-                      <motion.div
-                        className="p-2 sm:p-3 bg-gray-50/80 rounded-lg border shadow-inner min-h-[50px] sm:min-h-[60px] flex items-center justify-center text-center"
-                        style={previewStyles2}
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                      >
-                        {text2 || 'Text 2 Preview'}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </div>
-
-              <div className="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg border border-white/60 p-3 sm:p-4">
-                <h3 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3 flex items-center gap-2 text-gray-700">
                   <ImageIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  Image Preview
+                  Combined Preview
                 </h3>
-                <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gray-50/80 rounded-lg overflow-hidden border shadow-inner mx-auto">
-                  <img
-                    src={imageUrl}
-                    alt="Customization preview"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
+                <div className="flex flex-col gap-4 items-center">
+                  {/* Image Preview */}
+                  <div className="relative aspect-square w-full max-w-[300px] rounded-lg overflow-hidden">
+                    <img
+                      src={imageUrl}
+                      alt="Customization preview"
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  {/* Text Preview */}
+                  <div className="w-full space-y-2 sm:space-y-3">
+                    <div
+                      className="p-2 sm:p-3 bg-gray-50/80 rounded-lg border shadow-inner min-h-[50px] sm:min-h-[60px] flex items-center justify-center text-center"
+                      style={previewStyles1}
+                    >
+                      {text1 || 'Text 1 Preview'}
+                    </div>
+                    <AnimatePresence>
+                      {showText2 && (
+                        <motion.div
+                          className="p-2 sm:p-3 bg-gray-50/80 rounded-lg border shadow-inner min-h-[50px] sm:min-h-[60px] flex items-center justify-center text-center"
+                          style={previewStyles2}
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                        >
+                          {text2 || 'Text 2 Preview'}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
             </div>

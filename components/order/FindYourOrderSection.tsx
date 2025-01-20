@@ -14,32 +14,69 @@ interface FindYourOrderSectionProps {
 }
 
 export function FindYourOrderSection({ onOrderFetched }: FindYourOrderSectionProps) {
+  const [lookupMethod, setLookupMethod] = useState<"id" | "email">("id");
   const [orderId, setOrderId] = useState("");
+  const [email, setEmail] = useState("");
   const [orderDetails, setOrderDetails] = useState<WooCommerceOrder | null>(null);
+  const [orderList, setOrderList] = useState<WooCommerceOrder[]>([]);
   const [orderError, setOrderError] = useState<string | null>(null);
 
   const handleFetchOrder = async () => {
-    if (!orderId) {
-      setOrderError("Please enter an order ID");
-      return;
-    }
-
     setOrderError(null);
     setOrderDetails(null);
+    setOrderList([]);
 
     try {
-      const response = await fetch(`/api/woocommerce/orders/${orderId}`);
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to fetch order");
-      }
+      if (lookupMethod === "id") {
+        if (!orderId) {
+          setOrderError("Please enter an order ID");
+          return;
+        }
 
-      const order = await response.json();
-      setOrderDetails(order);
-      onOrderFetched(order);
+        const response = await fetch(`/api/woocommerce/orders/${orderId}`);
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Failed to fetch order");
+        }
+
+        const order = await response.json();
+        setOrderDetails(order);
+        onOrderFetched(order);
+      } else {
+        if (!email) {
+          setOrderError("Please enter your email");
+          return;
+        }
+
+        const response = await fetch(`/api/woocommerce/orders/by-email?email=${encodeURIComponent(email)}`);
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(
+            error.code === 'rest_forbidden'
+              ? "Please check if you're using the correct email address"
+              : error.error || "Failed to fetch orders"
+          );
+        }
+
+        const orders = await response.json();
+        if (orders.length === 0) {
+          setOrderError("No orders found for this email");
+        } else if (orders.length === 1) {
+          setOrderDetails(orders[0]);
+          onOrderFetched(orders[0]);
+        } else {
+          setOrderList(orders);
+        }
+      }
     } catch (error) {
       setOrderError(error instanceof Error ? error.message : "Failed to fetch order");
     }
+  };
+
+  const handleSelectOrder = (order: WooCommerceOrder) => {
+    setOrderDetails(order);
+    setOrderList([]);
+    onOrderFetched(order);
   };
 
   return (
@@ -54,19 +91,47 @@ export function FindYourOrderSection({ onOrderFetched }: FindYourOrderSectionPro
           </div>
           <p className="text-xs text-gray-500 pl-7">Enter your order ID to fetch details and final your order</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Input
-            placeholder="Order ID"
-            value={orderId}
-            onChange={(e) => setOrderId(e.target.value)}
-            className="flex-1 h-9 text-sm bg-white/80 border-gray-200/80 focus:border-purple-300 focus:ring-purple-200"
-          />
-          <Button
-            onClick={handleFetchOrder}
-            className="h-9 text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
-          >
-            Find Order
-          </Button>
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <Button
+              variant={lookupMethod === "id" ? "default" : "outline"}
+              onClick={() => setLookupMethod("id")}
+              className="h-9 text-sm"
+            >
+              Order ID
+            </Button>
+            <Button
+              variant={lookupMethod === "email" ? "default" : "outline"}
+              onClick={() => setLookupMethod("email")}
+              className="h-9 text-sm"
+            >
+              Email
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {lookupMethod === "id" ? (
+              <Input
+                placeholder="Order ID"
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+                className="flex-1 h-9 text-sm bg-white/80 border-gray-200/80 focus:border-purple-300 focus:ring-purple-200"
+              />
+            ) : (
+              <Input
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="flex-1 h-9 text-sm bg-white/80 border-gray-200/80 focus:border-purple-300 focus:ring-purple-200"
+              />
+            )}
+            <Button
+              onClick={handleFetchOrder}
+              className="h-9 text-sm bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              Find Order
+            </Button>
+          </div>
         </div>
         {!orderDetails && (
           <motion.div
@@ -92,7 +157,34 @@ export function FindYourOrderSection({ onOrderFetched }: FindYourOrderSectionPro
         </div>
       )}
 
-      {orderDetails && (
+      {orderList.length > 0 && (
+        <div className="space-y-3">
+          <div className="text-sm font-medium text-gray-700">Select your order:</div>
+          <div className="space-y-2">
+            {orderList.map((order) => (
+              <Card
+                key={order.id}
+                className="p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                onClick={() => handleSelectOrder(order)}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium">Order #{order.number}</div>
+                    <div className="text-sm text-gray-600">
+                      {new Date(order.date_created).toLocaleDateString()} - ₹{order.total}
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {order.line_items.length} item{order.line_items.length > 1 ? 's' : ''}
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {orderDetails && !orderList.length && (
         <div className="space-y-3">
           <div className="overflow-x-auto rounded-lg border border-gray-100/80 shadow-sm">
             <Table className="min-w-full text-sm bg-white/60 backdrop-blur-sm">

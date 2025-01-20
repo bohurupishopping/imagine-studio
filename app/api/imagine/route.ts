@@ -47,7 +47,7 @@ const formatEnhancedPrompt = (
     typography: 'typographic design, bold creative fonts, innovative text arrangement, clean layouts, balanced negative space, modern typographic compositions',
     illustrative: 'illustrative design, hand-drawn elements, detailed line work, artistic compositions, artistic style, balanced detail',
     graphic: 'graphic design, bold vibrant colors, geometric shapes, modern patterns, abstract compositions, effective color and shape balance',
-    'hand-drawn': 'hand-drawn style, sketch-like quality, organic shapes, artistic imperfections, creative illustrations, balanced detail'
+    '3d': '3D design, realistic modeling, depth and perspective, volumetric lighting, soft shadows, material textures, professional rendering, isometric view'
   };
 
   // T-shirt design focused prompt with style-specific additions
@@ -97,7 +97,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { prompt, model = 'black-forest-labs/FLUX.1-schnell-Free', size = '1200x1200', style = 'photo-realism' } = await request.json();
+    const { prompt, model = 'black-forest-labs/FLUX.1-schnell-Free', size = '1200x1200', style = 'graphic' } = await request.json();
 
     if (!prompt) {
       return NextResponse.json(

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, ChevronDown, Brush, PenTool, Type, Palette, Pencil, Sparkles } from 'lucide-react';
+import { Check, ChevronDown, Brush, PenTool, Type, Palette, Pencil, Sparkles, Box } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -14,33 +14,62 @@ import {
 export const imageStyles = {
   'minimalist': {
     name: 'Minimalist',
-    prompt: 'minimalist design, clean lines, simple shapes, monochromatic color scheme, negative space, modern aesthetic, geometric patterns, flat design, vector art, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    prompt: `minimalist t-shirt design, clean geometric shapes, precise lines, monochromatic color palette, 
+      maximum negative space, modern aesthetic, flat vector illustration, perfect symmetry, 
+      ultra-clean composition, professional t-shirt design, white background, isolated elements, 
+      print-ready, scalable vector graphics, high contrast, bold outlines, no gradients, 
+      no textures, no complex patterns, high resolution (300dpi), CMYK color mode, 
+      ready for screen printing, commercial use`,
     icon: <Brush className="w-3.5 h-3.5 mr-2" />
   },
   'vintage': {
     name: 'Vintage',
-    prompt: 'vintage t-shirt design, retro style, distressed textures, faded colors, classic typography, old school aesthetic, weathered look, hand-drawn elements, screen print effect, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    prompt: `vintage t-shirt design, retro 80s/90s style, distressed textures, faded color palette, 
+      halftone patterns, screen print effect, worn look, classic typography, hand-drawn elements, 
+      muted tones, subtle noise texture, retro color grading, vintage logo style, 
+      professional t-shirt design, white background, isolated elements, print-ready, 
+      scalable vector graphics, high resolution (300dpi), CMYK color mode, 
+      ready for screen printing, commercial use`,
     icon: <Sparkles className="w-3.5 h-3.5 mr-2" />
   },
   'typography': {
     name: 'Typography',
-    prompt: 'typographic design, bold fonts, creative text arrangement, modern typography, clean layout, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    prompt: `typographic t-shirt design, modern typography, creative text arrangement, 
+      bold sans-serif fonts, clean layout, perfect kerning, balanced negative space, 
+      text as graphic element, monochrome or duotone color scheme, professional t-shirt design, 
+      white background, isolated elements, print-ready, scalable vector graphics, 
+      high contrast, crisp edges, no complex textures, high resolution (300dpi), 
+      CMYK color mode, ready for screen printing, commercial use`,
     icon: <Type className="w-3.5 h-3.5 mr-2" />
   },
   'illustrative': {
     name: 'Illustrative',
-    prompt: 'illustrative design, hand-drawn elements, detailed line work, creative composition, artistic style, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    prompt: `illustrative t-shirt design, hand-drawn illustration style, detailed line work, 
+      creative composition, artistic flair, organic shapes, balanced detail, 
+      limited color palette, professional t-shirt design, white background, 
+      isolated elements, print-ready, scalable vector graphics, high resolution (300dpi), 
+      CMYK color mode, ready for screen printing, commercial use, 
+      includes subtle texture overlay for artistic effect`,
     icon: <PenTool className="w-3.5 h-3.5 mr-2" />
   },
   'graphic': {
     name: 'Graphic',
-    prompt: 'graphic design, bold colors, geometric shapes, modern patterns, abstract composition, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
+    prompt: `graphic t-shirt design, bold geometric patterns, vibrant color palette, 
+      modern abstract composition, clean vector shapes, high contrast, 
+      optical art influences, professional t-shirt design, white background, 
+      isolated elements, print-ready, scalable vector graphics, 
+      no gradients, no complex textures, high resolution (300dpi), 
+      CMYK color mode, ready for screen printing, commercial use`,
     icon: <Palette className="w-3.5 h-3.5 mr-2" />
   },
-  'hand-drawn': {
-    name: 'Hand Drawn',
-    prompt: 'hand-drawn design, sketch style, organic shapes, artistic imperfections, creative illustration, white background, isolated elements, print-ready, scalable graphics, professional t-shirt design, commercial use, no background, high resolution, 300dpi, CMYK color mode, ready for screen printing',
-    icon: <Pencil className="w-3.5 h-3.5 mr-2" />
+  '3d': {
+    name: '3D',
+    prompt: `3D t-shirt design, realistic 3D modeling, depth and perspective, 
+      volumetric lighting, soft shadows, material textures, professional rendering, 
+      isometric view, clean edges, professional t-shirt design, white background, 
+      isolated elements, print-ready, high resolution (300dpi), CMYK color mode, 
+      ready for screen printing, commercial use, includes subtle ambient occlusion`,
+    icon: <Box className="w-3.5 h-3.5 mr-2" />
   }
 };
 
